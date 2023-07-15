@@ -1,9 +1,10 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/roll-with-it/node_modules/*
+/node_modules
+roll-with-it/node_modules/*
 !/roll-with-it/node_modules/.git
-/roll-with-it-api/node_modules/*
+roll-with-it-api/node_modules/*
 !/roll-with-it-api/node_modules/.git
 /.pnp
 .pnp.js
