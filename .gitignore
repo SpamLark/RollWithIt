@@ -3,7 +3,6 @@
 # dependencies
 /roll-with-it/node_modules/
 /roll-with-it-api/node_modules/
-/roll-with-it-api/node_modules/*
 /.pnp
 .pnp.js
 
