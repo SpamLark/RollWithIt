@@ -17,6 +17,22 @@ async function getMultiple(page = 1){
   }
 }
 
+async function create(gameNight){
+  const result = await db.query(
+    `INSERT INTO game_night
+      (game_night_id, game_night_location, game_night_datetime)
+    VALUES
+      (${gameNight.game_night_id}, ${gameNight.game_night_location}, ${gameNight.game_night_datetime})`
+  );
+
+  let message = 'Error in creating game night';
+
+  if (result.affectedRows) {
+    message = 'Game night create successfully';
+  }
+}
+
 module.exports = {
-  getMultiple
+  getMultiple,
+  create
 }

@@ -12,4 +12,14 @@ router.get('/', async function(req, res, next) {
   }
 });
 
+/*POST game nights. */
+
+router.post('/', async function(req, res, next) {
+  try {
+    res.json(await gameNights.create(req.body));
+  } catch (err) {
+    console.error(`Error while creating game night`, err.message)
+  }
+});
+
 module.exports = router;
