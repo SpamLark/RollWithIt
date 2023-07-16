@@ -15,8 +15,6 @@ import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 /*import { Logo } from './Logo';*/
 
-
-
 function Header() {
   return(
     <>
