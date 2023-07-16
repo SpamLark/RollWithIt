@@ -16,9 +16,11 @@ router.get('/', async function(req, res, next) {
 
 router.post('/', async function(req, res, next) {
   try {
+    console.log(req.body);
     res.json(await gameNights.create(req.body));
   } catch (err) {
-    console.error(`Error while creating game night`, err.message)
+    console.error(`Error while creating game night`, err.message);
+    next(err);
   }
 });
 

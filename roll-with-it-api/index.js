@@ -2,16 +2,20 @@ const express = require("express");
 const app = express();
 const port = 8000;
 const gameNightsRouter = require("./routes/gameNights");
+const gameInstancesRouter = require("./routes/gameInstances");
 app.use(express.json());
 app.use(
   express.urlencoded({
     extended: true,
   })
 );
+
 app.get("/", (req, res) => {
   res.json({ message: "ok" });
 });
+
 app.use("/game-nights", gameNightsRouter);
+app.use("/game-instances", gameInstancesRouter);
 
 /* Error handler middleware */
 app.use((err, req, res, next) => {
