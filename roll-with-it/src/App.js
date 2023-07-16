@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ChakraProvider,
   Box,
@@ -55,11 +55,13 @@ function GameNight(){
   );
 }
 
-function GameNightTab ({date_time, venue}){
+function GameNightTabs ({gameNights}){
   return (
     <Tabs>
       <TabList alignItems='center' justifyContent='center'>
-        <Tab>{date_time} {venue}</Tab>
+      {gameNights.data && gameNights.data.map(gameNight => (
+            <Tab key={gameNight.game_night_id}>{gameNight.game_night_location} {gameNight.game_night_datetime}</Tab>
+          ))}
       </TabList>
       <TabPanels>
         <GameNight />
@@ -69,12 +71,29 @@ function GameNightTab ({date_time, venue}){
 }
 
 function App() {
+
+  const [gameNights, setGameNights] = useState([]);
+
+  const fetchGameNights = () => {
+    fetch("http://localhost:8000/game-nights")
+      .then(response => {
+        return response.json()
+      })
+      .then(data => {
+        setGameNights(data)
+      })
+  }
+
+  useEffect(() => {
+    fetchGameNights()
+  }, [])
+
   return (
     <ChakraProvider theme={theme}>
       <Box textAlign='center' fontSize='xl'>
         <Grid p={3}>
           <Header />
-          <GameNightTab date_time={'01/05/2023 8.00pm'} venue={'Room 101'}/>
+            <GameNightTabs gameNights={gameNights} />
         </Grid>
       </Box>
     </ChakraProvider>
