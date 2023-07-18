@@ -14,7 +14,7 @@ async function getInstancesByGameNight(gameNight){
         FROM 
             game_instance gi
         WHERE
-            game_night_id = ${gameNight.game_night_id}`
+            gi.game_night_id = ${gameNight.game_night_id}`
     );
     const data = helper.emptyOrRows(rows);
   

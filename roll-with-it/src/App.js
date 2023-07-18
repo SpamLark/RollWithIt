@@ -27,46 +27,66 @@ function Header() {
   );
 }
 
-function GameCard({game_name, host, num_players, max_players}) {
+const GameInstanceCards = ({gameNightId}) => {
+
+  const [gameInstances, setGameInstances] = useState([]);
+
+  const fetchGameInstances = () => {
+    const url = `http://localhost:8000/game-instances?game_night_id='${gameNightId}'`;
+    fetch(url)
+      .then(response => {
+        return response.json()
+      })
+      .then(data => {
+        setGameInstances(data)
+      })
+  }
+
+  useEffect(() => {
+    fetchGameInstances()
+  })
+
   return (
-      <Card>
+    gameInstances.data && gameInstances.data.map(gameInstance => (
+      <Card key={gameInstance.game_instance_id}>
         <CardHeader>
-          <Heading>{game_name}</Heading>
+          <Heading>{gameInstance.game_name}</Heading>
         </CardHeader>
         <CardBody>
-          <Text>{host}</Text>
-          <Text>{num_players} / {max_players}</Text>
+          <Text>{gameInstance.host_id}</Text>
+          <Text>{gameInstance.num_players} / {gameInstance.max_players}</Text>
+          <Text>Min. players: {gameInstance.min_players}</Text>
         </CardBody>
         <CardFooter justifyContent="center">
           <Button>Register to play</Button>
         </CardFooter>
       </Card>
+    ))
   );
 }
 
-function GameNight(){
-  return (
-    <TabPanel>
-      <Button>Create Game Instance</Button>
-      <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(300px, 1fr))'  alignItems='center'>
-        <GameCard game_name={'Scythe'} host={'Sam'} num_players={'4'} max_players={'6'}/>
-      </SimpleGrid>
-    </TabPanel>
-  );
-}
-
-function GameNightTabs ({gameNights}){
-  return (
-    <Tabs>
-      <TabList alignItems='center' justifyContent='center'>
+const GameNightTabPanels = ({gameNights}) => {
+    return(
+    <TabPanels>
       {gameNights.data && gameNights.data.map(gameNight => (
-            <Tab key={gameNight.game_night_id}>{gameNight.game_night_location} {gameNight.game_night_datetime}</Tab>
-          ))}
+      <TabPanel key={gameNight.game_night_id}>
+        <Button>Create Game Instance</Button>
+        <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(300px, 1fr))'  alignItems='center'>
+          <GameInstanceCards gameNightId = {gameNight.game_night_id} />
+        </SimpleGrid>
+      </TabPanel>
+      ))}
+    </TabPanels>
+    )
+};
+
+const GameNightTabHeadings = ({gameNights}) => {
+  return (
+      <TabList alignItems='center' justifyContent='center'>
+        {gameNights.data && gameNights.data.map(gameNight => (
+        <Tab key={gameNight.game_night_id}>{gameNight.game_night_location} {gameNight.game_night_datetime}</Tab>
+        ))}
       </TabList>
-      <TabPanels>
-        <GameNight />
-      </TabPanels>
-    </Tabs>
   );
 }
 
@@ -93,7 +113,10 @@ function App() {
       <Box textAlign='center' fontSize='xl'>
         <Grid p={3}>
           <Header />
-            <GameNightTabs gameNights={gameNights} />
+          <Tabs>
+            <GameNightTabHeadings gameNights={gameNights} />
+            <GameNightTabPanels gameNights={gameNights}/>
+          </Tabs>
         </Grid>
       </Box>
     </ChakraProvider>
