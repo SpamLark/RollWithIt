@@ -20,7 +20,7 @@ function Header() {
   return(
     <>
       <ColorModeSwitcher justifySelf='flex-end' />
-      <Heading>Oxa Board Game Club</Heading>
+      <Heading>Roll With It</Heading>
       <Center>
         <Button maxWidth='100px'>My Account</Button>
       </Center>
