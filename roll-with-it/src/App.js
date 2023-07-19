@@ -97,17 +97,17 @@ function App() {
 
   const [gameNights, setGameNights] = useState([]);
 
-  const fetchGameNights = () => {
-    fetch("http://localhost:8000/game-nights")
-      .then(response => {
-        return response.json()
-      })
-      .then(data => {
-        setGameNights(data)
-      })
-  }
-
   useEffect(() => {
+    const fetchGameNights = () => {
+      fetch("http://localhost:8000/game-nights")
+        .then(response => {
+          return response.json()
+        })
+        .then(data => {
+          setGameNights(data)
+        })
+    }
+
     fetchGameNights()
   }, [])
 
