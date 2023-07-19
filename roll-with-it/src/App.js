@@ -32,20 +32,20 @@ const GameInstanceCards = ({gameNightId}) => {
 
   const [gameInstances, setGameInstances] = useState([]);
 
-  const fetchGameInstances = () => {
-    const url = `http://localhost:8000/game-instances?game_night_id='${gameNightId}'`;
-    fetch(url)
-      .then(response => {
-        return response.json()
-      })
-      .then(data => {
-        setGameInstances(data)
-      })
-  }
-
   useEffect(() => {
+    const fetchGameInstances = () => {
+      const url = `http://localhost:8000/game-instances?game_night_id='${gameNightId}'`;
+      fetch(url)
+        .then(response => {
+          return response.json()
+        })
+        .then(data => {
+          setGameInstances(data)
+        })
+    }
+
     fetchGameInstances()
-  }, [])
+  }, [gameNightId])
 
   return (
     gameInstances.data && gameInstances.data.map(gameInstance => (
