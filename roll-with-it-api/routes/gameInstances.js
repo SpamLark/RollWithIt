@@ -16,9 +16,20 @@ router.get('/', async function(req, res, next) {
 router.post('/', async function(req, res, next) {
   try {
     console.log(req.body);
-    res.json(await gameInstances.create(req.body));
+    res.json(await gameInstances.createGameInstance(req.body));
   } catch (err) {
     console.error(`Error while creating game instance`, err.message);
+    next(err);
+  }
+});
+
+/*DELETE game instance. */
+
+router.delete('/:id', async function(req, res, next){
+  try {
+    res.json(await gameInstances.removeGameInstance(req.params.id));
+  } catch (err) {
+    console.error(`Error while removing game instance`, err.message);
     next(err);
   }
 });

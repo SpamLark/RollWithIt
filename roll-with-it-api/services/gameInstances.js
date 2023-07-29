@@ -23,7 +23,7 @@ async function getInstancesByGameNight(gameNight){
     }
 }
 
-async function create(gameInstance){
+async function createGameInstance(gameInstance){
     const result = await db.query(
       `INSERT INTO game_instance (host_id, game_night_id, game_name, min_players, max_players)      
       VALUES
@@ -38,7 +38,21 @@ async function create(gameInstance){
     return {message};
   }
 
+async function removeGameInstance(gameInstanceId){
+  const result = await db.query(
+    `DELETE FROM game_instance WHERE game_instance_id = '${gameInstanceId}'`
+  );
+
+  let message = 'Error deleting game instance';
+
+  if (result.affectedRows) {
+    message = 'Game instance deleted successfully';
+  }
+  return {message};
+}
+
 module.exports = {
     getInstancesByGameNight,
-    create
+    createGameInstance,
+    removeGameInstance
 }
