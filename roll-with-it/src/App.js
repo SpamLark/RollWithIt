@@ -36,13 +36,15 @@ const GameInstanceForm = ({gameNightId, onGameInstanceAdded}) => {
 
   const {isOpen, onOpen, onClose} = useDisclosure();
 
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     host_id: '',
     game_night_id: gameNightId,
     game_name: '',
     min_players: '',
     max_players: '',
-  });
+  }
+
+  const [formData, setFormData] = useState(initialFormData);
 
   const handleChange = (e) => {
     const {name, value} = e.target;
@@ -70,6 +72,8 @@ const GameInstanceForm = ({gameNightId, onGameInstanceAdded}) => {
         onClose(true);
         //Re-render the current game night tab
         onGameInstanceAdded();
+        //Reset the form
+        setFormData(initialFormData);
         //Add success steps
       } else {
         console.error('Game Instance creation failed.');
@@ -80,6 +84,12 @@ const GameInstanceForm = ({gameNightId, onGameInstanceAdded}) => {
       //Add error handling
     }
   };
+
+  const handleCancel = () => {
+    //Reset the form
+    setFormData(initialFormData);    
+    onClose(true);
+  }
 
   return (
   <>
@@ -111,7 +121,7 @@ const GameInstanceForm = ({gameNightId, onGameInstanceAdded}) => {
       </ModalBody>
       <ModalFooter>
         <Button type="submit" onClick={handleSubmit} mr={5}>Save</Button>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleCancel}>Cancel</Button>
       </ModalFooter>
     </ModalContent>
   </Modal>
