@@ -13,7 +13,6 @@ router.get('/', async function(req, res, next) {
 });
 
 /*POST game nights. */
-
 router.post('/', async function(req, res, next) {
   try {
     console.log(req.body);

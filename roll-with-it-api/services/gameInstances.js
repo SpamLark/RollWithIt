@@ -23,6 +23,22 @@ async function getInstancesByGameNight(gameNight){
     }
 }
 
+async function create(gameInstance){
+    const result = await db.query(
+      `INSERT INTO game_instance (host_id, game_night_id, game_name, min_players, max_players)      
+      VALUES
+      ('${gameInstance.host_id}', '${gameInstance.game_night_id}', '${gameInstance.game_name}', '${gameInstance.min_players}', '${gameInstance.max_players}')`
+    );
+  
+    let message = 'Error in creating game instance';
+  
+    if (result.affectedRows) {
+      message = 'Game instance created successfully';
+    }
+    return {message};
+  }
+
 module.exports = {
-    getInstancesByGameNight
+    getInstancesByGameNight,
+    create
 }
