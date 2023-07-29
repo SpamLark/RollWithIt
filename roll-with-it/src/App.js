@@ -32,7 +32,9 @@ function Header() {
   );
 }
 
-const GameInstanceForm = ({gameNightId}) => {
+const GameInstanceForm = ({gameNightId, onGameInstanceAdded}) => {
+
+  const {isOpen, onOpen, onClose} = useDisclosure();
 
   const [formData, setFormData] = useState({
     host_id: '',
@@ -64,6 +66,10 @@ const GameInstanceForm = ({gameNightId}) => {
 
       if (response.ok) {
         console.log('Game Instance Data submitted successfully.');
+        //Close modal form
+        onClose(true);
+        //Re-render the current game night tab
+        onGameInstanceAdded();
         //Add success steps
       } else {
         console.error('Game Instance creation failed.');
@@ -74,8 +80,6 @@ const GameInstanceForm = ({gameNightId}) => {
       //Add error handling
     }
   };
-
-  const {isOpen, onOpen, onClose} = useDisclosure();
 
   return (
   <>
@@ -115,7 +119,7 @@ const GameInstanceForm = ({gameNightId}) => {
   )
 }
 
-const GameInstanceCards = ({gameNightId}) => {
+const GameInstanceCards = ({gameNightId, gameInstancesUpdated}) => {
 
   const [gameInstances, setGameInstances] = useState([]);
 
@@ -132,7 +136,7 @@ const GameInstanceCards = ({gameNightId}) => {
     }
 
     fetchGameInstances()
-  }, [gameNightId])
+  }, [gameNightId, gameInstancesUpdated])
 
   return (
     gameInstances.data && gameInstances.data.map(gameInstance => (
@@ -154,19 +158,29 @@ const GameInstanceCards = ({gameNightId}) => {
 }
 
 const GameNightTabPanels = ({gameNights}) => {
+  const [gameInstancesUpdated, setGameInstancesUpdated] = useState(false);
 
-    return(
-    <TabPanels>
-      {gameNights.data && gameNights.data.map(gameNight => (
-      <TabPanel key={gameNight.game_night_id}>
-        <GameInstanceForm gameNightId={gameNight.game_night_id}/>
-        <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(300px, 1fr))'  alignItems='center'>
-          <GameInstanceCards gameNightId = {gameNight.game_night_id} />
-        </SimpleGrid>
-      </TabPanel>
-      ))}
-    </TabPanels>
-    )
+  const handleGameInstanceAdded = () => {
+    // Set gameInstancesUpdated to True to trigger the re-rendering of the Tab Panel
+    setGameInstancesUpdated(true);
+    // Set back to False to allow for further form submissions
+    setTimeout(() => {
+      setGameInstancesUpdated(false);
+    }, 1000);
+  };
+
+  return(
+  <TabPanels>
+    {gameNights.data && gameNights.data.map(gameNight => (
+    <TabPanel key={gameNight.game_night_id}>
+      <GameInstanceForm gameNightId={gameNight.game_night_id} onGameInstanceAdded={handleGameInstanceAdded}/>
+      <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(300px, 1fr))'  alignItems='center'>
+        <GameInstanceCards gameNightId = {gameNight.game_night_id} gameInstancesUpdated={gameInstancesUpdated}/>
+      </SimpleGrid>
+    </TabPanel>
+    ))}
+  </TabPanels>
+  )
 };
 
 const GameNightTabHeadings = ({gameNights}) => {
