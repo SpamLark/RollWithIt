@@ -129,7 +129,7 @@ const GameInstanceForm = ({gameNightId, onGameInstanceAdded}) => {
   )
 }
 
-const GameInstanceCards = ({gameNightId, gameInstancesUpdated}) => {
+const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceDeleted}) => {
 
   const [gameInstances, setGameInstances] = useState([]);
 
@@ -148,6 +148,30 @@ const GameInstanceCards = ({gameNightId, gameInstancesUpdated}) => {
     fetchGameInstances()
   }, [gameNightId, gameInstancesUpdated])
 
+  const deleteGameInstance = async ({gameInstanceId}) => {
+    try {
+      const url = `http://localhost:8000/game-instances/${gameInstanceId}`;
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        console.log('Game instance successfully deleted.');
+        //Re-render the current game night tab
+        onGameInstanceDeleted();
+      } else {
+        console.error('Game instance removal failed.');
+        //Add error handling
+      }
+    } catch (error) {
+      console.error('Error removing game instance:', error);
+      //Add error handling
+    }
+  }
+
   return (
     gameInstances.data && gameInstances.data.map(gameInstance => (
       <Card key={gameInstance.game_instance_id}>
@@ -161,6 +185,7 @@ const GameInstanceCards = ({gameNightId, gameInstancesUpdated}) => {
         </CardBody>
         <CardFooter justifyContent="center">
           <Button>Register to play</Button>
+          <Button onClick={()=>deleteGameInstance({gameInstanceId: gameInstance.game_instance_id})}>Delete</Button>
         </CardFooter>
       </Card>
     ))
@@ -170,7 +195,7 @@ const GameInstanceCards = ({gameNightId, gameInstancesUpdated}) => {
 const GameNightTabPanels = ({gameNights}) => {
   const [gameInstancesUpdated, setGameInstancesUpdated] = useState(false);
 
-  const handleGameInstanceAdded = () => {
+  const handleGameInstanceChange = () => {
     // Set gameInstancesUpdated to True to trigger the re-rendering of the Tab Panel
     setGameInstancesUpdated(true);
     // Set back to False to allow for further form submissions
@@ -183,9 +208,9 @@ const GameNightTabPanels = ({gameNights}) => {
   <TabPanels>
     {gameNights.data && gameNights.data.map(gameNight => (
     <TabPanel key={gameNight.game_night_id}>
-      <GameInstanceForm gameNightId={gameNight.game_night_id} onGameInstanceAdded={handleGameInstanceAdded}/>
+      <GameInstanceForm gameNightId={gameNight.game_night_id} onGameInstanceAdded={handleGameInstanceChange}/>
       <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(300px, 1fr))'  alignItems='center'>
-        <GameInstanceCards gameNightId = {gameNight.game_night_id} gameInstancesUpdated={gameInstancesUpdated}/>
+        <GameInstanceCards gameNightId = {gameNight.game_night_id} gameInstancesUpdated={gameInstancesUpdated} onGameInstanceDeleted={handleGameInstanceChange}/>
       </SimpleGrid>
     </TabPanel>
     ))}
