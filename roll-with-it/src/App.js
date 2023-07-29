@@ -8,11 +8,15 @@ import {
   theme,
   Heading,
   Button,
-  Center
+  Center,
+  FormControl,
+  useDisclosure
 } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import { SimpleGrid } from '@chakra-ui/react';
 import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react';
+import {Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter} from '@chakra-ui/react';
+import {FormLabel, Input} from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 /*import { Logo } from './Logo';*/
 
@@ -26,6 +30,46 @@ function Header() {
       </Center>
     </>
   );
+}
+
+const CreateGameInstanceButton = ({onOpen}) => {
+  return (
+    <Button onClick={onOpen}>Create Game Instance</Button>
+  );
+};
+
+const GameInstanceForm = ({isOpen, onClose, gameNightId}) => {
+  return (
+  <Modal isOpen={isOpen} onClose={onClose}>
+    <ModalOverlay />
+    <ModalContent>
+      <ModalHeader>Create Game Instance</ModalHeader>
+      <ModalCloseButton />
+      <ModalBody>
+      <FormControl>
+          <FormLabel>User ID</FormLabel>
+          <Input />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Game Name</FormLabel>
+          <Input />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Minimum Players</FormLabel>
+          <Input />
+        </FormControl>
+        <FormControl>
+          <FormLabel>Maximum Players</FormLabel>
+          <Input />
+        </FormControl>
+      </ModalBody>
+      <ModalFooter>
+        <Button onClick={onClose} mr={5}>Save</Button>
+        <Button onClick={onClose}>Cancel</Button>
+      </ModalFooter>
+    </ModalContent>
+  </Modal>
+  )
 }
 
 const GameInstanceCards = ({gameNightId}) => {
@@ -67,11 +111,15 @@ const GameInstanceCards = ({gameNightId}) => {
 }
 
 const GameNightTabPanels = ({gameNights}) => {
+
+    const {isOpen, onOpen, onClose} = useDisclosure();
+
     return(
     <TabPanels>
       {gameNights.data && gameNights.data.map(gameNight => (
       <TabPanel key={gameNight.game_night_id}>
-        <Button>Create Game Instance</Button>
+        <CreateGameInstanceButton onOpen={onOpen} />
+        <GameInstanceForm isOpen={isOpen} onClose={onClose} />
         <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(300px, 1fr))'  alignItems='center'>
           <GameInstanceCards gameNightId = {gameNight.game_night_id} />
         </SimpleGrid>
