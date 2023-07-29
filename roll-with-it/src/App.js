@@ -32,43 +32,86 @@ function Header() {
   );
 }
 
-const CreateGameInstanceButton = ({onOpen}) => {
-  return (
-    <Button onClick={onOpen}>Create Game Instance</Button>
-  );
-};
+const GameInstanceForm = ({gameNightId}) => {
 
-const GameInstanceForm = ({isOpen, onClose, gameNightId}) => {
+  const [formData, setFormData] = useState({
+    host_id: '',
+    game_night_id: gameNightId,
+    game_name: '',
+    min_players: '',
+    max_players: '',
+  });
+
+  const handleChange = (e) => {
+    const {name, value} = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const url = 'http://localhost:8000/game-instances';
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(formData).toString(),
+      });
+
+      if (response.ok) {
+        console.log('Game Instance Data submitted successfully.');
+        //Add success steps
+      } else {
+        console.error('Game Instance creation failed.');
+        //Add error handling
+      }
+    } catch (error) {
+      console.error('Error submnitting form data:', error);
+      //Add error handling
+    }
+  };
+
+  const {isOpen, onOpen, onClose} = useDisclosure();
+
   return (
+  <>
+  <Button onClick={onOpen}>Create Game Instance</Button>
   <Modal isOpen={isOpen} onClose={onClose}>
     <ModalOverlay />
     <ModalContent>
       <ModalHeader>Create Game Instance</ModalHeader>
       <ModalCloseButton />
       <ModalBody>
-      <FormControl>
-          <FormLabel>User ID</FormLabel>
-          <Input />
-        </FormControl>
-        <FormControl>
-          <FormLabel>Game Name</FormLabel>
-          <Input />
-        </FormControl>
-        <FormControl>
-          <FormLabel>Minimum Players</FormLabel>
-          <Input />
-        </FormControl>
-        <FormControl>
-          <FormLabel>Maximum Players</FormLabel>
-          <Input />
-        </FormControl>
+        <form key={gameNightId} onSubmit={handleSubmit}>
+          <FormControl>
+              <FormLabel>User ID</FormLabel>
+              <Input name="host_id" value={formData.host_id} onChange={handleChange} />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Game Name</FormLabel>
+              <Input name="game_name" value ={formData.game_name} onChange={handleChange} />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Minimum Players</FormLabel>
+              <Input name="min_players" value={formData.min_players} onChange={handleChange} />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Maximum Players</FormLabel>
+              <Input name="max_players" value={formData.max_players} onChange={handleChange} />
+            </FormControl>
+        </form>
       </ModalBody>
       <ModalFooter>
-        <Button onClick={onClose} mr={5}>Save</Button>
+        <Button type="submit" onClick={handleSubmit} mr={5}>Save</Button>
         <Button onClick={onClose}>Cancel</Button>
       </ModalFooter>
     </ModalContent>
   </Modal>
+  </>
   )
 }
 
@@ -112,14 +155,11 @@ const GameInstanceCards = ({gameNightId}) => {
 
 const GameNightTabPanels = ({gameNights}) => {
 
-    const {isOpen, onOpen, onClose} = useDisclosure();
-
     return(
     <TabPanels>
       {gameNights.data && gameNights.data.map(gameNight => (
       <TabPanel key={gameNight.game_night_id}>
-        <CreateGameInstanceButton onOpen={onOpen} />
-        <GameInstanceForm isOpen={isOpen} onClose={onClose} />
+        <GameInstanceForm gameNightId={gameNight.game_night_id}/>
         <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(300px, 1fr))'  alignItems='center'>
           <GameInstanceCards gameNightId = {gameNight.game_night_id} />
         </SimpleGrid>
