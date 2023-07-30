@@ -21,6 +21,7 @@ import { ColorModeSwitcher } from './ColorModeSwitcher';
 import LogInModal from './components/LogInModal';
 import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useToast } from '@chakra-ui/react'
 /*import { Logo } from './Logo';*/
 
 //Firebase configuration settings
@@ -40,20 +41,6 @@ const app = initializeApp(firebaseConfig);
 //Initialise Firebase Authentication and get a reference to the service
 const auth = getAuth(app);
 
-//State observer for authenticated users
-// onAuthStateChanged(auth, (user) => {
-//   if (user) {
-//     // User is signed in, see docs for a list of available properties
-//     // https://firebase.google.com/docs/reference/js/auth.user
-//     const uid = user.uid;
-//     console.log('User ID is: ', uid);
-//     // ...
-//   } else {
-//     // User is signed out
-//     // ...
-//   }
-// });
-
 function Header() {
   return(
     <>
@@ -66,12 +53,12 @@ function Header() {
   );
 }
 
-const GameInstanceForm = ({gameNightId, onGameInstanceAdded}) => {
+const GameInstanceForm = ({user, gameNightId, onGameInstanceAdded, registerForGameInstance}) => {
 
   const {isOpen, onOpen, onClose} = useDisclosure();
 
   const initialFormData = {
-    host_id: '',
+    host_id: user.uid,
     game_night_id: gameNightId,
     game_name: '',
     min_players: '',
@@ -101,9 +88,12 @@ const GameInstanceForm = ({gameNightId, onGameInstanceAdded}) => {
       });
 
       if (response.ok) {
+        const data = await response.json();
         console.log('Game Instance Data submitted successfully.');
         //Close modal form
         onClose(true);
+        //Create player registration for user creating game instance
+        registerForGameInstance({gameInstanceId: data.game_instance_id, user: user});  //gameInstanceId, user
         //Re-render the current game night tab
         onGameInstanceAdded();
         //Reset the form
@@ -114,7 +104,7 @@ const GameInstanceForm = ({gameNightId, onGameInstanceAdded}) => {
         //Add error handling
       }
     } catch (error) {
-      console.error('Error submnitting form data:', error);
+      console.error('Error creating Game Instance: ', error);
       //Add error handling
     }
   };
@@ -136,21 +126,17 @@ const GameInstanceForm = ({gameNightId, onGameInstanceAdded}) => {
       <ModalBody>
         <form key={gameNightId} onSubmit={handleSubmit}>
           <FormControl>
-              <FormLabel>User ID</FormLabel>
-              <Input name="host_id" value={formData.host_id} onChange={handleChange} />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Game Name</FormLabel>
-              <Input name="game_name" value ={formData.game_name} onChange={handleChange} />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Minimum Players</FormLabel>
-              <Input name="min_players" value={formData.min_players} onChange={handleChange} />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Maximum Players</FormLabel>
-              <Input name="max_players" value={formData.max_players} onChange={handleChange} />
-            </FormControl>
+            <FormLabel>Game Name</FormLabel>
+            <Input name="game_name" value ={formData.game_name} onChange={handleChange} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Minimum Players</FormLabel>
+            <Input name="min_players" value={formData.min_players} onChange={handleChange} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Maximum Players</FormLabel>
+            <Input name="max_players" value={formData.max_players} onChange={handleChange} />
+          </FormControl>
         </form>
       </ModalBody>
       <ModalFooter>
@@ -163,7 +149,7 @@ const GameInstanceForm = ({gameNightId, onGameInstanceAdded}) => {
   )
 }
 
-const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceDeleted, user}) => {
+const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceChange, user, registerForGameInstance}) => {
 
   const [gameInstances, setGameInstances] = useState([]);
 
@@ -195,7 +181,7 @@ const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceDel
       if (response.ok) {
         console.log('Game instance successfully deleted.');
         //Re-render the current game night tab
-        onGameInstanceDeleted();
+        onGameInstanceChange();
       } else {
         console.error('Game instance removal failed.');
         //Add error handling
@@ -218,7 +204,7 @@ const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceDel
           <Text>Min. players: {gameInstance.min_players}</Text>
         </CardBody>
         <CardFooter justifyContent="center">
-          <Button onClick={()=>console.log('Current user: ', {user})}>Register to play</Button>
+          <Button onClick={()=>registerForGameInstance({gameInstanceId: gameInstance.game_instance_id, user: user})}>Register to play</Button>
           <Button onClick={()=>deleteGameInstance({gameInstanceId: gameInstance.game_instance_id})}>Delete</Button>
         </CardFooter>
       </Card>
@@ -226,8 +212,65 @@ const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceDel
   );
 }
 
-const GameNightTabPanels = ({gameNights, user}) => {
+const GameNightTabPanels = ({gameNights, user, toast}) => {
   const [gameInstancesUpdated, setGameInstancesUpdated] = useState(false);
+
+  const registerForGameInstance = async ({gameInstanceId, user}) => {
+    //Define message body
+    const registrationInformation = {
+      uid: user.uid,
+      game_instance_id: gameInstanceId,
+    }
+    //API call
+    try {
+      const url = `http://localhost:8000/player-registrations`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(registrationInformation).toString(),
+      });
+
+      if (response.ok) {
+        console.log('Player registration submitted successfully.')
+        //re-render game cards
+        handleGameInstanceChange();
+        //toast the success
+        toast({
+          title: 'Registration Successful.',
+          description: 'You are registered for this game.',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        })
+      } else {
+        const data = await response.json();
+        console.log(data);
+        console.error('Player registration failed');
+        if (data.message.includes('Duplicate entry')) {
+          toast({
+            title: 'Already Registered.',
+            description: 'It looks like you are already registered for this game.',
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+          })
+        } else {
+          toast({
+            title: 'System Error',
+            description: 'Please contact the system administrator',
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Error submitting player registration: ', error);
+      //Add error handling
+    }
+  }
 
   const handleGameInstanceChange = () => {
     // Set gameInstancesUpdated to True to trigger the re-rendering of the Tab Panel
@@ -242,9 +285,21 @@ const GameNightTabPanels = ({gameNights, user}) => {
   <TabPanels>
     {gameNights.data && gameNights.data.map(gameNight => (
     <TabPanel key={gameNight.game_night_id}>
-      <GameInstanceForm gameNightId={gameNight.game_night_id} onGameInstanceAdded={handleGameInstanceChange}/>
+      <GameInstanceForm 
+        user={user}
+        gameNightId={gameNight.game_night_id} 
+        onGameInstanceAdded={handleGameInstanceChange} 
+        registerForGameInstance={registerForGameInstance}
+      />
       <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(300px, 1fr))'  alignItems='center'>
-        <GameInstanceCards gameNightId = {gameNight.game_night_id} gameInstancesUpdated={gameInstancesUpdated} onGameInstanceDeleted={handleGameInstanceChange} user={user}/>
+        <GameInstanceCards 
+          gameNightId = {gameNight.game_night_id} 
+          gameInstancesUpdated={gameInstancesUpdated} 
+          onGameInstanceChange={handleGameInstanceChange}
+          registerForGameInstance={registerForGameInstance}
+          user={user} 
+          toast={toast}
+        />
       </SimpleGrid>
     </TabPanel>
     ))}
@@ -269,6 +324,7 @@ const App = () => {
   const [showLoginModal, setShowLoginModal] = useState(true);
   const [gameNights, setGameNights] = useState([]);
   const [user, setUser] = useState();
+  const toast = useToast();
 
   onAuthStateChanged(auth, (user) => {
     setUser(user);
@@ -296,7 +352,7 @@ const App = () => {
           <Header />
           <Tabs>
             <GameNightTabHeadings gameNights={gameNights} />
-            <GameNightTabPanels gameNights={gameNights} user={user}/>
+            <GameNightTabPanels gameNights={gameNights} user={user} toast={toast}/>
           </Tabs>
         </Grid>
       </Box>
