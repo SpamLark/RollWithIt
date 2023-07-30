@@ -21,7 +21,10 @@ const LogInModal = ({ isOpen, onClose, auth }) => {
     e.preventDefault();
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
+        const user = userCredential.user;
         console.log('User logged in:', userCredential.user);
+        console.log('User email is: ', email);
+        console.log('User UID is: ', user.uid);
         onClose();
       })
       .catch((error) => {
@@ -33,12 +36,41 @@ const LogInModal = ({ isOpen, onClose, auth }) => {
     e.preventDefault();
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
+        const accountDetails = {
+          uid: userCredential.user.uid,
+          email: email,
+        }
+        createUserAccount(accountDetails);
         console.log('User logged in:', userCredential.user);
         onClose();
       })
       .catch((error) => {
         console.error('Login error:', error);
       });
+  };
+
+  const createUserAccount = async (accountDetails) => {
+    try {
+      const url = 'http://localhost:8000/users';
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(accountDetails).toString(),
+      });
+
+      if (response.ok) {
+        console.log('User submitted successfully.');
+        //Add success steps
+      } else {
+        console.error('User creation failed.');
+        //Add error handling
+      }
+    } catch (error) {
+      console.error('Error submnitting form data:', error);
+      //Add error handling
+    }
   };
 
     return (
