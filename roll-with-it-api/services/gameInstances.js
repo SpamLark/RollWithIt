@@ -1,6 +1,5 @@
 const db = require('./db');
 const helper = require('../helper');
-const config = require('../config');
 
 async function getInstancesByGameNight(gameNight){
     const rows = await db.query(
@@ -31,21 +30,27 @@ async function createGameInstance(gameInstance){
     );
   
     let message = 'Error in creating game instance';
+    let gameInstanceId = null;
   
     if (result.affectedRows) {
       message = 'Game instance created successfully';
+      gameInstanceId = result.insertId;
     }
-    return {message};
+    return {message, game_instance_id: gameInstanceId};
   }
 
 async function removeGameInstance(gameInstanceId){
-  const result = await db.query(
-    `DELETE FROM game_instances WHERE game_instance_id = '${gameInstanceId}'`
+  const result1 = await db.query(
+    `DELETE FROM player_registrations WHERE game_instance_id = '${gameInstanceId}'`
   );
+
+  const result2 = await db.query(
+    `DELETE FROM game_instances WHERE game_instance_id = '${gameInstanceId}'`
+  )
 
   let message = 'Error deleting game instance';
 
-  if (result.affectedRows) {
+  if (result1.affectedRows && result2.affectedRows) {
     message = 'Game instance deleted successfully';
   }
   return {message};
