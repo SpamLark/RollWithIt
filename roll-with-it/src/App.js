@@ -18,7 +18,27 @@ import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react';
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from '@chakra-ui/react';
 import { FormLabel, Input } from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
+import LogInModal from './components/LogInModal';
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 /*import { Logo } from './Logo';*/
+
+//Firebase configuration settings
+const firebaseConfig = {
+  apiKey: "AIzaSyA48x4aQTrFL9_x-BKmiIIwlWWKm2heI9U",
+  authDomain: "rollwithit-481b5.firebaseapp.com",
+  projectId: "rollwithit-481b5",
+  storageBucket: "rollwithit-481b5.appspot.com",
+  messagingSenderId: "417094467342",
+  appId: "1:417094467342:web:aaff1aa4b84cc212c6e15f",
+  measurementId: "G-9JCL2CQ9TH"
+};
+
+//Initialise Firebase app
+const app = initializeApp(firebaseConfig);
+
+//Initialise Firebase Authentication and get a reference to the service
+const auth = getAuth(app);
 
 function Header() {
   return(
@@ -230,8 +250,9 @@ const GameNightTabHeadings = ({gameNights}) => {
   );
 }
 
-function App() {
+const App = () => {
 
+  const [showLoginModal, setShowLoginModal] = useState(true);
   const [gameNights, setGameNights] = useState([]);
 
   useEffect(() => {
@@ -250,6 +271,7 @@ function App() {
 
   return (
     <ChakraProvider theme={theme}>
+      <LogInModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} auth={auth} />
       <Box textAlign='center' fontSize='xl'>
         <Grid p={3}>
           <Header />
