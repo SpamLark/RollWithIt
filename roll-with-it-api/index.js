@@ -4,6 +4,7 @@ const app = express();
 const port = 8000;
 const gameNightsRouter = require("./routes/gameNights");
 const gameInstancesRouter = require("./routes/gameInstances");
+const usersRouter = require("./routes/users");
 app.use(express.json());
 app.use(
   express.urlencoded({
@@ -18,6 +19,7 @@ app.get("/", (req, res) => {
 
 app.use("/game-nights", gameNightsRouter);
 app.use("/game-instances", gameInstancesRouter);
+app.use("/users", usersRouter);
 
 /* Error handler middleware */
 app.use((err, req, res, next) => {

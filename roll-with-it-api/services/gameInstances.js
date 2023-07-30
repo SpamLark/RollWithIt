@@ -10,9 +10,9 @@ async function getInstancesByGameNight(gameNight){
             game_name, 
             min_players, 
             max_players, 
-            (SELECT COUNT(*) FROM player_registration pr WHERE pr.game_instance_id = gi.game_instance_id) AS num_players
+            (SELECT COUNT(*) FROM player_registrations pr WHERE pr.game_instance_id = gi.game_instance_id) AS num_players
         FROM 
-            game_instance gi
+            game_instances gi
         WHERE
             gi.game_night_id = ${gameNight.game_night_id}`
     );
@@ -25,7 +25,7 @@ async function getInstancesByGameNight(gameNight){
 
 async function createGameInstance(gameInstance){
     const result = await db.query(
-      `INSERT INTO game_instance (host_id, game_night_id, game_name, min_players, max_players)      
+      `INSERT INTO game_instances (host_id, game_night_id, game_name, min_players, max_players)      
       VALUES
       ('${gameInstance.host_id}', '${gameInstance.game_night_id}', '${gameInstance.game_name}', '${gameInstance.min_players}', '${gameInstance.max_players}')`
     );
