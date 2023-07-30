@@ -1,13 +1,13 @@
-CREATE TABLE user (
-    user_id int NOT NULL AUTO_INCREMENT,
+CREATE TABLE users (
+    user_id varchar(36) NOT NULL,
     username varchar(20),
     email varchar(50) NOT NULL,
     is_admin boolean NOT NULL,
     PRIMARY KEY(user_id)
 );
 
-CREATE INDEX index_user
-ON user (user_id, username, email);
+CREATE INDEX index_users
+ON users (user_id, username, email);
 
 INSERT INTO user (username, email, is_admin)
 VALUES ('testUser1', 'testUser1@invalid.com', false);
