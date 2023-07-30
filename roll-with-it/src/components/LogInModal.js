@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Box, Link } from '@chakra-ui/react';
 import { FormControl, Button } from '@chakra-ui/react';
 import { FormLabel, Input } from '@chakra-ui/react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
 const LogInModal = ({ isOpen, onClose, auth }) => {
 
@@ -20,6 +20,18 @@ const LogInModal = ({ isOpen, onClose, auth }) => {
   const handleSignIn = (e) => {
     e.preventDefault();
     signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        console.log('User logged in:', userCredential.user);
+        onClose();
+      })
+      .catch((error) => {
+        console.error('Login error:', error);
+      });
+  };
+
+  const handleSignUp = (e) => {
+    e.preventDefault();
+    createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log('User logged in:', userCredential.user);
         onClose();
@@ -51,7 +63,7 @@ const LogInModal = ({ isOpen, onClose, auth }) => {
             </Box>
           </ModalBody>
           <ModalFooter justifyContent="center">
-            <Link onClick={() => onClose(true)}>Register</Link>
+            <Link onClick={handleSignUp}>Register</Link>
           </ModalFooter>
         </ModalContent>
       </Modal>
