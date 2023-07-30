@@ -41,18 +41,18 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 //State observer for authenticated users
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // User is signed in, see docs for a list of available properties
-    // https://firebase.google.com/docs/reference/js/auth.user
-    const uid = user.uid;
-    console.log('User ID is: ', uid);
-    // ...
-  } else {
-    // User is signed out
-    // ...
-  }
-});
+// onAuthStateChanged(auth, (user) => {
+//   if (user) {
+//     // User is signed in, see docs for a list of available properties
+//     // https://firebase.google.com/docs/reference/js/auth.user
+//     const uid = user.uid;
+//     console.log('User ID is: ', uid);
+//     // ...
+//   } else {
+//     // User is signed out
+//     // ...
+//   }
+// });
 
 function Header() {
   return(
@@ -163,7 +163,7 @@ const GameInstanceForm = ({gameNightId, onGameInstanceAdded}) => {
   )
 }
 
-const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceDeleted}) => {
+const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceDeleted, user}) => {
 
   const [gameInstances, setGameInstances] = useState([]);
 
@@ -218,7 +218,7 @@ const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceDel
           <Text>Min. players: {gameInstance.min_players}</Text>
         </CardBody>
         <CardFooter justifyContent="center">
-          <Button>Register to play</Button>
+          <Button onClick={()=>console.log('Current user: ', {user})}>Register to play</Button>
           <Button onClick={()=>deleteGameInstance({gameInstanceId: gameInstance.game_instance_id})}>Delete</Button>
         </CardFooter>
       </Card>
@@ -226,7 +226,7 @@ const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceDel
   );
 }
 
-const GameNightTabPanels = ({gameNights}) => {
+const GameNightTabPanels = ({gameNights, user}) => {
   const [gameInstancesUpdated, setGameInstancesUpdated] = useState(false);
 
   const handleGameInstanceChange = () => {
@@ -244,7 +244,7 @@ const GameNightTabPanels = ({gameNights}) => {
     <TabPanel key={gameNight.game_night_id}>
       <GameInstanceForm gameNightId={gameNight.game_night_id} onGameInstanceAdded={handleGameInstanceChange}/>
       <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(300px, 1fr))'  alignItems='center'>
-        <GameInstanceCards gameNightId = {gameNight.game_night_id} gameInstancesUpdated={gameInstancesUpdated} onGameInstanceDeleted={handleGameInstanceChange}/>
+        <GameInstanceCards gameNightId = {gameNight.game_night_id} gameInstancesUpdated={gameInstancesUpdated} onGameInstanceDeleted={handleGameInstanceChange} user={user}/>
       </SimpleGrid>
     </TabPanel>
     ))}
@@ -268,6 +268,11 @@ const App = () => {
 
   const [showLoginModal, setShowLoginModal] = useState(true);
   const [gameNights, setGameNights] = useState([]);
+  const [user, setUser] = useState();
+
+  onAuthStateChanged(auth, (user) => {
+    setUser(user);
+  });
 
   useEffect(() => {
     const fetchGameNights = () => {
@@ -291,7 +296,7 @@ const App = () => {
           <Header />
           <Tabs>
             <GameNightTabHeadings gameNights={gameNights} />
-            <GameNightTabPanels gameNights={gameNights}/>
+            <GameNightTabPanels gameNights={gameNights} user={user}/>
           </Tabs>
         </Grid>
       </Box>
