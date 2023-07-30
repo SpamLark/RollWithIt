@@ -40,7 +40,7 @@ async function createGameInstance(gameInstance){
 
 async function removeGameInstance(gameInstanceId){
   const result = await db.query(
-    `DELETE FROM game_instance WHERE game_instance_id = '${gameInstanceId}'`
+    `DELETE FROM game_instances WHERE game_instance_id = '${gameInstanceId}'`
   );
 
   let message = 'Error deleting game instance';
