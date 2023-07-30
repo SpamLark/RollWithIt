@@ -20,7 +20,7 @@ import { FormLabel, Input } from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import LogInModal from './components/LogInModal';
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 /*import { Logo } from './Logo';*/
 
 //Firebase configuration settings
@@ -39,6 +39,20 @@ const app = initializeApp(firebaseConfig);
 
 //Initialise Firebase Authentication and get a reference to the service
 const auth = getAuth(app);
+
+//State observer for authenticated users
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is signed in, see docs for a list of available properties
+    // https://firebase.google.com/docs/reference/js/auth.user
+    const uid = user.uid;
+    console.log('User ID is: ', uid);
+    // ...
+  } else {
+    // User is signed out
+    // ...
+  }
+});
 
 function Header() {
   return(
