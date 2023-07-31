@@ -19,6 +19,7 @@ import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, Modal
 import { FormLabel, Input } from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import LogInModal from './components/LogInModal';
+import CreateGameNightModal from './components/CreateGameNightModal';
 import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useToast } from '@chakra-ui/react'
@@ -42,12 +43,17 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 function Header() {
+
+  const [showCreateGameNightModal, setShowCreateGameNightModal] = useState();
+  
   return(
     <>
       <ColorModeSwitcher justifySelf='flex-end' />
       <Heading>Roll With It</Heading>
       <Center>
         <Button maxWidth='100px'>My Account</Button>
+        <Button maxWidth='200px' onClick={() => setShowCreateGameNightModal(true)}>Create Game Night</Button>
+        <CreateGameNightModal isOpen={showCreateGameNightModal} onClose={() => setShowCreateGameNightModal(false)}/>
       </Center>
     </>
   );
@@ -57,16 +63,31 @@ const GameInstanceForm = ({user, gameNightId, onGameInstanceAdded, registerForGa
 
   const {isOpen, onOpen, onClose} = useDisclosure();
 
-  const initialFormData = {
-    host_id: user.uid,
+  const [initialFormData, setInitialFormData] = useState ({
+    host_id: '',
     game_night_id: gameNightId,
     game_name: '',
     min_players: '',
     max_players: '',
-  }
+  });
 
   const [formData, setFormData] = useState(initialFormData);
 
+  // Use Effect hook to update initialFormData and current form data when the user logs in
+  useEffect(() => {
+    if (user && user.uid) {
+      setInitialFormData((prevFormData) => ({
+        ...prevFormData,
+        host_id: user.uid,
+      }));
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        host_id: user.uid
+      }));
+    }
+  }, [user]);
+
+  //Update form data
   const handleChange = (e) => {
     const {name, value} = e.target;
     setFormData((prevFormData) => ({

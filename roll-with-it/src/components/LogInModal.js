@@ -68,7 +68,7 @@ const LogInModal = ({ isOpen, onClose, auth }) => {
         //Add error handling
       }
     } catch (error) {
-      console.error('Error submnitting form data:', error);
+      console.error('Error submitting form data:', error);
       //Add error handling
     }
   };
