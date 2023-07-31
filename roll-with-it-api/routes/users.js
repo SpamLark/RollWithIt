@@ -13,4 +13,14 @@ router.post('/', async function(req, res, next) {
     }
   });
 
+  /*GET user by uid */
+  router.get('/:uid', async function(req, res, next){
+    try {
+      res.json(await users.getUserById(req.params.uid));
+    } catch (err) {
+      console.error(`Error while getting account info`, err.message);
+      next(err);
+    }
+  });
+
   module.exports = router;

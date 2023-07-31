@@ -1,6 +1,4 @@
 const db = require('./db');
-const helper = require('../helper');
-const config = require('../config');
 
 async function createUser(user){
     const result = await db.query(
@@ -17,6 +15,23 @@ async function createUser(user){
     return {message};
   }
 
+async function getUserById(uid){
+  const accountInfo = await db.query(
+    `SELECT
+      user_id,
+      username,
+      is_admin
+    FROM 
+      users
+    WHERE
+      users.user_id = '${uid}'`
+  );
+  return {
+    accountInfo
+  }
+}
+
   module.exports = {
-    createUser
+    createUser,
+    getUserById
 }
