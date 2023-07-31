@@ -26,12 +26,27 @@ async function getUserById(uid){
     WHERE
       users.user_id = '${uid}'`
   );
-  return {
-    accountInfo
+}
+
+async function updateUserProfile(uid, accountInfo){
+  const result = await db.query(
+    `UPDATE users
+    SET
+      username='${accountInfo.username}',
+      is_admin='${accountInfo.isAdmin}'
+    WHERE
+      user_id = '${uid}'`
+  );
+  let message = 'Error updating user';
+  
+  if (result.affectedRows) {
+    message = 'User updated';
   }
+  return {message};
 }
 
   module.exports = {
     createUser,
-    getUserById
+    getUserById,
+    updateUserProfile
 }

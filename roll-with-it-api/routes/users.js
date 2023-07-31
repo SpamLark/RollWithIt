@@ -14,11 +14,21 @@ router.post('/', async function(req, res, next) {
   });
 
   /*GET user by uid */
-  router.get('/:uid', async function(req, res, next){
+  router.get('/:uid', async function(req, res, next) {
     try {
       res.json(await users.getUserById(req.params.uid));
     } catch (err) {
       console.error(`Error while getting account info`, err.message);
+      next(err);
+    }
+  });
+
+  /*PUT user info by uid */
+  router.put('/:uid', async function(req, res, next) {
+    try {
+      res.json(await users.updateUserProfile(req.params.uid, req.body))
+    } catch (err) {
+      console.error(`Error while updating user. `, err.message);
       next(err);
     }
   });
