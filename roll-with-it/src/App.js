@@ -8,7 +8,8 @@ import {
   theme,
   Heading,
   Button,
-  Center
+  Center,
+  Flex
 } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import { SimpleGrid } from '@chakra-ui/react';
@@ -17,9 +18,12 @@ import { ColorModeSwitcher } from './ColorModeSwitcher';
 import LogInModal from './components/LogInModal';
 import CreateGameNightModal from './components/CreateGameNightModal';
 import GameInstanceForm from './components/GameInstanceForm';
+import MyAccountModal from './components/MyAccountModal';
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { useToast } from '@chakra-ui/react'
+import { Spinner } from '@chakra-ui/react'
+import { Stack } from '@chakra-ui/react'
 /*import { Logo } from './Logo';*/
 
 //Firebase configuration settings
@@ -210,16 +214,22 @@ const GameNightTabHeadings = ({gameNights}) => {
   );
 }
 
-function Header({handleGameNightChange}) {
+function Header({handleGameNightChange, user, auth}) {
 
   const [showCreateGameNightModal, setShowCreateGameNightModal] = useState();
+  const [showMyAccountModal, setShowMyAccountModal] = useState();
   
   return(
     <>
-      <ColorModeSwitcher justifySelf='flex-end' />
+      <Flex justifyContent="space-between">
+        <Text fontSize='sm'>Logged in as {user?.email}</Text>
+        <ColorModeSwitcher />
+      </Flex>
+      <Flex justifySelf='flex-start'><Button fontSize='sm' onClick={() => {signOut(auth)}}>Log Out</Button></Flex>
       <Heading>Roll With It</Heading>
       <Center>
-        <Button maxWidth='100px'>My Account</Button>
+        <Button maxWidth='100px' onClick={() => setShowMyAccountModal(true)}>My Account</Button>
+        <MyAccountModal user={user} isOpen={showMyAccountModal} onClose={() => setShowMyAccountModal(false)} />
         <Button maxWidth='200px' onClick={() => setShowCreateGameNightModal(true)}>Create Game Night</Button>
         <CreateGameNightModal isOpen={showCreateGameNightModal} onClose={() => setShowCreateGameNightModal(false)} handleGameNightChange={handleGameNightChange}/>
       </Center>
@@ -229,15 +239,23 @@ function Header({handleGameNightChange}) {
 
 const App = () => {
 
-  const [showLoginModal, setShowLoginModal] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [gameNights, setGameNights] = useState([]);
   const [user, setUser] = useState();
+  const [account, setAccount] = useState({username: '', isAdmin: ''});
   const toast = useToast();
   const [gameNightsUpdated, setGameNightsUpdated] = useState(false);
 
   onAuthStateChanged(auth, (user) => {
     setUser(user);
+    setLoading(false)
   });
+
+  useEffect(() => {
+    if (user) {
+      fetchAccountInfoFromDatabase();
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchGameNights = () => {
@@ -253,6 +271,18 @@ const App = () => {
     fetchGameNights()
   }, [gameNightsUpdated])
 
+  //NEED TO ADD ERROR HANDLING HERE
+  const fetchAccountInfoFromDatabase = () => {
+    fetch(`http://localhost:8000/users/${user.uid}`)
+      .then(response => response.json())
+      .then((data) => {
+        setAccount({
+          username: data.accountInfo[0].username,
+          isAdmin: data.accountInfo[0].is_admin,
+        })
+      })
+  }
+
   const handleGameNightChange = () => {
     // Set gameNightsUpdated to True to trigger the re-rendering of the Tab Headings
     setGameNightsUpdated(true);
@@ -262,12 +292,28 @@ const App = () => {
     }, 1000);
   }
 
+  if (loading) {
+    // While loading, don't render anything (you can also display a loading spinner)
+    return (
+      <ChakraProvider theme={theme}>
+        <Center h="100vh">
+          <Stack>
+            <Box textAlign='center'>
+          <Spinner size='xl' />
+          </Box>
+          <Heading>Fun times ahead</Heading>
+          </Stack>
+        </Center>
+     </ChakraProvider>
+    )
+  }
+
   return (
     <ChakraProvider theme={theme}>
-      <LogInModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} auth={auth} />
+      {!user && <LogInModal isOpen={true} onClose={() => {}} auth={auth} />}
       <Box textAlign='center' fontSize='xl'>
         <Grid p={3}>
-          <Header handleGameNightChange={handleGameNightChange} />
+          <Header handleGameNightChange={handleGameNightChange} user={user} account={account} auth={auth} />
           <Tabs>
             <GameNightTabHeadings gameNights={gameNights} />
             <GameNightTabPanels gameNights={gameNights} user={user} toast={toast}/>
