@@ -39,22 +39,6 @@ const app = initializeApp(firebaseConfig);
 //Initialise Firebase Authentication and get a reference to the service
 const auth = getAuth(app);
 
-function Header() {
-
-  const [showCreateGameNightModal, setShowCreateGameNightModal] = useState();
-  
-  return(
-    <>
-      <ColorModeSwitcher justifySelf='flex-end' />
-      <Heading>Roll With It</Heading>
-      <Center>
-        <Button maxWidth='100px'>My Account</Button>
-        <Button maxWidth='200px' onClick={() => setShowCreateGameNightModal(true)}>Create Game Night</Button>
-        <CreateGameNightModal isOpen={showCreateGameNightModal} onClose={() => setShowCreateGameNightModal(false)}/>
-      </Center>
-    </>
-  );
-}
 
 const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceChange, user, registerForGameInstance}) => {
 
@@ -226,12 +210,30 @@ const GameNightTabHeadings = ({gameNights}) => {
   );
 }
 
+function Header({handleGameNightChange}) {
+
+  const [showCreateGameNightModal, setShowCreateGameNightModal] = useState();
+  
+  return(
+    <>
+      <ColorModeSwitcher justifySelf='flex-end' />
+      <Heading>Roll With It</Heading>
+      <Center>
+        <Button maxWidth='100px'>My Account</Button>
+        <Button maxWidth='200px' onClick={() => setShowCreateGameNightModal(true)}>Create Game Night</Button>
+        <CreateGameNightModal isOpen={showCreateGameNightModal} onClose={() => setShowCreateGameNightModal(false)} handleGameNightChange={handleGameNightChange}/>
+      </Center>
+    </>
+  );
+}
+
 const App = () => {
 
   const [showLoginModal, setShowLoginModal] = useState(true);
   const [gameNights, setGameNights] = useState([]);
   const [user, setUser] = useState();
   const toast = useToast();
+  const [gameNightsUpdated, setGameNightsUpdated] = useState(false);
 
   onAuthStateChanged(auth, (user) => {
     setUser(user);
@@ -249,14 +251,23 @@ const App = () => {
     }
 
     fetchGameNights()
-  }, [])
+  }, [gameNightsUpdated])
+
+  const handleGameNightChange = () => {
+    // Set gameNightsUpdated to True to trigger the re-rendering of the Tab Headings
+    setGameNightsUpdated(true);
+    // Set back to False to allow for further form submissions
+    setTimeout(() => {
+      setGameNightsUpdated(false);
+    }, 1000);
+  }
 
   return (
     <ChakraProvider theme={theme}>
       <LogInModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} auth={auth} />
       <Box textAlign='center' fontSize='xl'>
         <Grid p={3}>
-          <Header />
+          <Header handleGameNightChange={handleGameNightChange} />
           <Tabs>
             <GameNightTabHeadings gameNights={gameNights} />
             <GameNightTabPanels gameNights={gameNights} user={user} toast={toast}/>

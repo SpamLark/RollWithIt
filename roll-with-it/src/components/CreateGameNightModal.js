@@ -4,7 +4,7 @@ import { FormControl, Button } from '@chakra-ui/react';
 import { FormLabel, Input } from '@chakra-ui/react';
 import moment from 'moment';
 
-const CreateGameNightModal = ({ isOpen, onClose}) => {
+const CreateGameNightModal = ({ isOpen, onClose, handleGameNightChange}) => {
 
     const [location, setLocation] = useState('');
     const [dateTime, setDateTime] = useState('');
@@ -40,6 +40,7 @@ const CreateGameNightModal = ({ isOpen, onClose}) => {
             if(response.ok) {
                 console.log('Game night submitted successfully.');
                 //Add success steps
+                handleGameNightChange();
                 onClose();
             } else {
                 console.log('Game night creation failed.');
