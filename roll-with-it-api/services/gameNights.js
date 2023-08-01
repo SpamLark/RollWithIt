@@ -17,7 +17,14 @@ async function getMultiple(page = 1){
   }
 }
 
-async function create(gameNight){
+async function create(gameNight, uid){
+
+  const isAdmin = await helper.isAdminMiddleware(uid);
+
+  if (!isAdmin) {
+    return {message: 'You do not have permission to access this resource.'}
+  }
+
   const result = await db.query(
     `INSERT INTO game_nights (game_night_location, game_night_datetime)      
     VALUES

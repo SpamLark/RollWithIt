@@ -5,13 +5,14 @@ async function getInstancesByGameNight(gameNight){
     const rows = await db.query(
         `SELECT 
             game_instance_id, 
-            host_id, 
+            COALESCE(username, email) AS host_id,
             game_name, 
             min_players, 
             max_players, 
             (SELECT COUNT(*) FROM player_registrations pr WHERE pr.game_instance_id = gi.game_instance_id) AS num_players
         FROM 
             game_instances gi
+            JOIN users ON gi.host_id = users.user_id
         WHERE
             gi.game_night_id = ${gameNight.game_night_id}`
     );

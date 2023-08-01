@@ -214,10 +214,10 @@ const GameNightTabHeadings = ({gameNights}) => {
   );
 }
 
-function Header({handleGameNightChange, user, auth}) {
+function Header({handleGameNightChange, user, account, auth, fetchAccountInfoFromDatabase}) {
 
-  const [showCreateGameNightModal, setShowCreateGameNightModal] = useState();
-  const [showMyAccountModal, setShowMyAccountModal] = useState();
+  const [showCreateGameNightModal, setShowCreateGameNightModal] = useState(false);
+  const [showMyAccountModal, setShowMyAccountModal] = useState(false);
   
   return(
     <>
@@ -229,9 +229,31 @@ function Header({handleGameNightChange, user, auth}) {
       <Heading>Roll With It</Heading>
       <Center>
         <Button maxWidth='100px' onClick={() => setShowMyAccountModal(true)}>My Account</Button>
-        <MyAccountModal user={user} isOpen={showMyAccountModal} onClose={() => setShowMyAccountModal(false)} />
-        <Button maxWidth='200px' onClick={() => setShowCreateGameNightModal(true)}>Create Game Night</Button>
-        <CreateGameNightModal isOpen={showCreateGameNightModal} onClose={() => setShowCreateGameNightModal(false)} handleGameNightChange={handleGameNightChange}/>
+        <MyAccountModal 
+          user={user} 
+          account={account} 
+          fetchAccountInfoFromDatabase={fetchAccountInfoFromDatabase}
+          auth={auth} 
+          isOpen={showMyAccountModal} 
+          onClose={() => setShowMyAccountModal(false)} 
+        />
+        <Button 
+          maxWidth='200px' 
+          onClick={() => setShowCreateGameNightModal(true)}
+          // onClick={() => {
+          //   if (account.isAdmin === 1) {
+          //     setShowCreateGameNightModal(true);
+          //   }
+          // }
+          // }
+          >Create Game Night</Button>
+        <CreateGameNightModal 
+          isOpen={showCreateGameNightModal}
+          account={account}
+          user={user}
+          onClose={() => setShowCreateGameNightModal(false)} 
+          handleGameNightChange={handleGameNightChange}
+        />
       </Center>
     </>
   );
@@ -255,6 +277,7 @@ const App = () => {
     if (user) {
       fetchAccountInfoFromDatabase();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   useEffect(() => {
@@ -276,6 +299,7 @@ const App = () => {
     fetch(`http://localhost:8000/users/${user.uid}`)
       .then(response => response.json())
       .then((data) => {
+        console.log(data);
         setAccount({
           username: data.accountInfo[0].username,
           isAdmin: data.accountInfo[0].is_admin,
@@ -313,7 +337,13 @@ const App = () => {
       {!user && <LogInModal isOpen={true} onClose={() => {}} auth={auth} />}
       <Box textAlign='center' fontSize='xl'>
         <Grid p={3}>
-          <Header handleGameNightChange={handleGameNightChange} user={user} account={account} auth={auth} />
+          <Header 
+            handleGameNightChange={handleGameNightChange} 
+            user={user} 
+            account={account} 
+            fetchAccountInfoFromDatabase={fetchAccountInfoFromDatabase} 
+            auth={auth} 
+          />
           <Tabs>
             <GameNightTabHeadings gameNights={gameNights} />
             <GameNightTabPanels gameNights={gameNights} user={user} toast={toast}/>

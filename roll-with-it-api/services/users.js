@@ -26,6 +26,9 @@ async function getUserById(uid){
     WHERE
       users.user_id = '${uid}'`
   );
+  return {
+    accountInfo
+  }
 }
 
 async function updateUserProfile(uid, accountInfo){
@@ -33,7 +36,8 @@ async function updateUserProfile(uid, accountInfo){
     `UPDATE users
     SET
       username='${accountInfo.username}',
-      is_admin='${accountInfo.isAdmin}'
+      is_admin='${accountInfo.isAdmin}',
+      email='${accountInfo.email}'
     WHERE
       user_id = '${uid}'`
   );

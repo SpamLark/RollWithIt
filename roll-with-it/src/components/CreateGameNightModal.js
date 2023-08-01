@@ -4,7 +4,7 @@ import { FormControl, Button } from '@chakra-ui/react';
 import { FormLabel, Input } from '@chakra-ui/react';
 import moment from 'moment';
 
-const CreateGameNightModal = ({ isOpen, onClose, handleGameNightChange}) => {
+const CreateGameNightModal = ({ isOpen, onClose, handleGameNightChange, user, account}) => {
 
     const [location, setLocation] = useState('');
     const [dateTime, setDateTime] = useState('');
@@ -22,10 +22,13 @@ const CreateGameNightModal = ({ isOpen, onClose, handleGameNightChange}) => {
         const formattedDateTime = parsedMoment.format('YYYY-MM-DD HH:mm:ss');
         console.log(location);
         console.log(formattedDateTime);
+        console.log(account.isAdmin);
         const gameNightDetails = {
             game_night_location: location,
             game_night_datetime: formattedDateTime,
+            is_admin: account.isAdmin,
         }
+        console.log(gameNightDetails);
         e.preventDefault();
         try {
             const url = 'http://localhost:8000/game-nights';
@@ -33,11 +36,15 @@ const CreateGameNightModal = ({ isOpen, onClose, handleGameNightChange}) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
+                    Authorization: user.uid
                 },
                 body: new URLSearchParams(gameNightDetails).toString(),
             });
-
-            if(response.ok) {
+            const data = await response.json();
+            if (data.message.includes('do not have permission')) {
+                console.log('You do not have permission to perform that action');
+            }
+            else if(response.ok) {
                 console.log('Game night submitted successfully.');
                 //Add success steps
                 handleGameNightChange();
