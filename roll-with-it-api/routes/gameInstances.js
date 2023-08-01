@@ -5,7 +5,7 @@ const gameInstances = require('../services/gameInstances');
 /* GET game instances by game night id */
 router.get('/', async function(req, res, next) {
   try {
-    res.json(await gameInstances.getInstancesByGameNight(req.query));
+    res.json(await gameInstances.getInstancesByGameNight(req.query.game_night_id));
   } catch (err) {
     console.error(`Error while getting game instances `, err.message);
     next(err);
