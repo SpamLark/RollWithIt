@@ -4,7 +4,7 @@ async function createUser(user){
     const result = await db.query(
       `INSERT INTO users (user_id, email, is_admin)      
       VALUES
-      ('${user.uid}', '${user.email}', 0)`
+      (?, ?, 0)`, [user.uid, user.email]
     );
   
     let message = 'Error in adding new user to database';
@@ -24,7 +24,7 @@ async function getUserById(uid){
     FROM 
       users
     WHERE
-      users.user_id = '${uid}'`
+      users.user_id = ?`, [uid]
   );
   return {
     accountInfo
@@ -39,7 +39,7 @@ async function updateUserProfile(uid, accountInfo){
       is_admin='${accountInfo.isAdmin}',
       email='${accountInfo.email}'
     WHERE
-      user_id = '${uid}'`
+      user_id = ?`, [uid]
   );
   let message = 'Error updating user';
   
