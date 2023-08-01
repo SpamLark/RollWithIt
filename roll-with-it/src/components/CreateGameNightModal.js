@@ -59,8 +59,17 @@ const CreateGameNightModal = ({ isOpen, onClose, handleGameNightChange, user, ac
         }
     };
 
+    // Reset fields when the user closes the modal without submitting
+    const handleModalClose = () => {
+        setLocation('');
+        setDateTime('');
+    }
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={() => {
+            handleModalClose();
+            onClose();
+        }}>
             <ModalOverlay bg='blackAlpha.300' backdropFilter='blur(10px) hue-rotate(90deg)'/>
             <ModalContent>
                 <ModalHeader>Create Game Night</ModalHeader>
