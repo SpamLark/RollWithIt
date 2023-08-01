@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, Box, Link } from '@chakra-ui/react';
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Link } from '@chakra-ui/react';
 import { FormControl, Button } from '@chakra-ui/react';
 import { FormLabel, Input } from '@chakra-ui/react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
@@ -78,7 +78,6 @@ const LogInModal = ({ isOpen, onClose, auth }) => {
         <ModalOverlay bg='blackAlpha.300' backdropFilter='blur(10px) hue-rotate(90deg)'/>
         <ModalContent>
           <ModalHeader>Login</ModalHeader>
-          <ModalCloseButton />
           <ModalBody>
             <form>
               <FormControl>
