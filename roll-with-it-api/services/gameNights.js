@@ -28,7 +28,7 @@ async function create(gameNight, uid){
   const result = await db.query(
     `INSERT INTO game_nights (game_night_location, game_night_datetime)      
     VALUES
-    ('${gameNight.game_night_location}', '${gameNight.game_night_datetime}')`
+    (?, ?)`, [gameNight.game_night_location, gameNight.game_night_datetime]
   );
 
   let message = 'Error in creating game night';
