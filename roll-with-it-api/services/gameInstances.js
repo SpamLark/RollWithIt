@@ -40,7 +40,16 @@ async function createGameInstance(gameInstance){
     return {message, game_instance_id: gameInstanceId};
   }
 
-async function removeGameInstance(gameInstanceId){
+async function removeGameInstance(gameInstanceId, userId){
+
+  const isAdmin = await helper.isAdminMiddleware(userId);
+  const isHost = await helper.isHostMiddleware(userId, gameInstanceId);
+
+  // If user calling the API is neither an Admin nor the Host, escape the function.
+  if (!isAdmin && !isHost) {
+    return {message: 'You do not have permission to delete this game night'}
+  }
+
   const result1 = await db.query(
     `DELETE FROM player_registrations WHERE game_instance_id = '${gameInstanceId}'`
   );

@@ -27,7 +27,7 @@ router.post('/', async function(req, res, next) {
 
 router.delete('/:id', async function(req, res, next){
   try {
-    res.json(await gameInstances.removeGameInstance(req.params.id));
+    res.json(await gameInstances.removeGameInstance(req.params.id, req.headers.authorization));
   } catch (err) {
     console.error(`Error while removing game instance`, err.message);
     next(err);
