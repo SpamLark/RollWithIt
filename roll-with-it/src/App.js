@@ -70,10 +70,14 @@ const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceCha
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: user.uid
         },
       });
-
-      if (response.ok) {
+      const data = await response.json();
+      if (data.message.includes('do not have permission')) {
+          console.log('You do not have permission to perform that action');
+      }
+      else if (response.ok) {
         console.log('Game instance successfully deleted.');
         //Re-render the current game night tab
         onGameInstanceChange();
