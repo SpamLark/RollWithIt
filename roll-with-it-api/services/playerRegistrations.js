@@ -6,7 +6,7 @@ async function createPlayerRegistration(registrationDetails){
   const hasCapacity = await helper.hasCapacityMiddleware(registrationDetails.game_instance_id);
 
   if (!hasCapacity) {
-    return {status: 409, message: 'This game is currently full.'}
+    return {status: 409, message: 'This game is currently full.'};
   }
 
   const result = await db.query(
@@ -18,7 +18,7 @@ async function createPlayerRegistration(registrationDetails){
   let message = 'Error whilst recording player registration';
 
   if (result.affectedRows) {
-    message = 'Player registration recorded';
+    return {status: 200, message: 'Player registration recorded'};
   }
   return {message};
 }
