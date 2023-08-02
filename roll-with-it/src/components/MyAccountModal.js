@@ -4,14 +4,16 @@ import { FormControl,FormLabel, Input, Button } from '@chakra-ui/react';
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider, updateEmail } from 'firebase/auth';
 
 
-const MyAccountModal = ({isOpen, onClose, user, account, fetchAccountInfoFromDatabase}) => {
+const MyAccountModal = ({isOpen, onClose, user, account, fetchAccountInfoFromDatabase, toast}) => {
 
+    // Declare state constants
     const [username, setUsername] = useState(account?.username);
     const [newUsername, setNewUsername] = useState(account?.username);
     const [email, setEmail] = useState(user?.email);
     const [newEmail, setEmailNew] = useState(user?.email);
     const [passwordNew, setPasswordNew] = useState('');
     
+    // If user or account props change, reset all state constants
     useEffect(() => {
         setUsername(account?.username);
         setNewUsername(account?.username);
@@ -20,18 +22,22 @@ const MyAccountModal = ({isOpen, onClose, user, account, fetchAccountInfoFromDat
         setPasswordNew('');
     }, [user, account]);
 
+    // Update new username state constant as form field is updated
     const handleUsernameChange = (e) => {
         setNewUsername(e.target.value);
     }
 
+    // Update new email state constant as form field is updated
     const handleEmailChange = (e) => {
         setEmailNew(e.target.value);
     }
 
+    // Update new password state constant as form field is updated
     const handlePasswordNewChange = (e) => {
         setPasswordNew(e.target.value);
     }
 
+    // Function calls API to update account details in Roll With It database
     const updateAccountInfo = async (username, email) => {
         const newAccountInfo = {
             uid: user.uid,
@@ -59,6 +65,7 @@ const MyAccountModal = ({isOpen, onClose, user, account, fetchAccountInfoFromDat
         }
     }
 
+    // Function called by submitting the form
     const handleAccountUpdate = async () => {
         // If account details are unchanged, close the modal and escape the function
         if (newEmail === email && passwordNew === '' && newUsername === username) {
@@ -76,6 +83,13 @@ const MyAccountModal = ({isOpen, onClose, user, account, fetchAccountInfoFromDat
             await reauthenticateWithCredential(user, credential);
         } catch (error) {
             console.error('Error re-authenticating: ', error);
+            toast({
+                title: 'Error Re-authenticating',
+                description: 'Please double check your current password and try again',
+                status: 'error',
+                duration: 3000,
+                isClosable: true,
+              })
             return;
         }
         // If email has been updated, submit it to Firebase and to RollWithIt database
@@ -84,8 +98,44 @@ const MyAccountModal = ({isOpen, onClose, user, account, fetchAccountInfoFromDat
                 await updateEmail(user, newEmail);
                 console.log('Email changed successfully.');
                 await updateAccountInfo(username, newEmail);
+                // Set the email stored in state to the new email in case user tries to change email again.
+                setEmail(newEmail);
+                toast({
+                    title: 'Email Updated',
+                    description: 'Your email has been successfully changed',
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                  })
             } catch (error) {
                 console.error('Error updating email: ', error)
+                // Use handleModalClose to reset the form
+                handleModalClose();
+                if (error.message.includes('invalid')) {
+                    toast({
+                        title: 'Email Update Failed',
+                        description: 'Please enter a valid email.',
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                      })
+                } else if (error.message.includes('already-in-use')) {
+                    toast({
+                        title: 'Email Update Failed',
+                        description: 'That email is already in use on a different account',
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                } else {
+                    toast({
+                        title: 'Email Update Failed',
+                        description: 'Please contact the administrator',
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    })
+                }
             }
         }
         // If new password has been added, submit it to Firebase
@@ -93,28 +143,55 @@ const MyAccountModal = ({isOpen, onClose, user, account, fetchAccountInfoFromDat
             try {
                 await updatePassword(user, passwordNew);
                 console.log('Password changed successfully.');
+                toast({
+                    title: 'Password Updated',
+                    description: 'Your password has been successfully changed',
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                  })
             } catch (error) {
                 console.error('Error updating password: ', error)
+                toast({
+                    title: 'Password Update Failed',
+                    description: 'If problem persists, please contact the administrator',
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                  })
             }
         }
         // If username has been updated, submit it to RollWithIt database
         if (newUsername !== username) {
             try {
                 await updateAccountInfo(newUsername, newEmail);
+                toast({
+                    title: 'Username Changed',
+                    description: 'Your username has been successfully changed',
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                  })
                 // Refresh account details in app
                 fetchAccountInfoFromDatabase();
             } catch (error) {
                 console.error('Error updating username: ', error);
+                toast({
+                    title: 'Username Update Failed',
+                    description: 'If problem persists, please contact the administrator',
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                  })
             }
         }
-        console.log(account.username);
         // Clear new password field
         setPasswordNew('');
         // Close modal
         onClose();
     }
 
-    // Reset fields when the user closes the modal without submitting
+    // Reset fields when the modal is closed
     const handleModalClose = () => {
         setEmailNew(email);
         setNewUsername(username);
