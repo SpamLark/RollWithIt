@@ -24,6 +24,8 @@ import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { useToast } from '@chakra-ui/react'
 import { Spinner } from '@chakra-ui/react'
 import { Stack } from '@chakra-ui/react'
+import { IconButton } from '@chakra-ui/react'
+import { DeleteIcon } from '@chakra-ui/icons'
 /*import { Logo } from './Logo';*/
 
 //Firebase configuration settings
@@ -44,7 +46,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 
-const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceChange, user, registerForGameInstance}) => {
+const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceChange, user, registerForGameInstance, toast}) => {
 
   const [gameInstances, setGameInstances] = useState([]);
 
@@ -75,6 +77,13 @@ const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceCha
       });
       const data = await response.json();
       if (data.message.includes('do not have permission')) {
+          toast({
+            title: 'Cannot Delete',
+            description: 'Only the host or an admin can delete a game',
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+          })
           console.log('You do not have permission to perform that action');
       }
       else if (response.ok) {
@@ -94,9 +103,17 @@ const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceCha
   return (
     gameInstances.data && gameInstances.data.map(gameInstance => (
       <Card key={gameInstance.game_instance_id}>
-        <CardHeader>
+      <CardHeader>
+        <Flex justifyContent="flex-end">
+          <IconButton
+            aria-label="Delete game instance"
+            icon={<DeleteIcon />}
+            alignSelf="flex-end"
+            onClick={()=>deleteGameInstance({gameInstanceId: gameInstance.game_instance_id})}
+          />
+        </Flex>
           <Heading>{gameInstance.game_name}</Heading>
-        </CardHeader>
+      </CardHeader>
         <CardBody>
           <Text>{gameInstance.host_id}</Text>
           <Text>{gameInstance.num_players} / {gameInstance.max_players}</Text>
@@ -104,7 +121,6 @@ const GameInstanceCards = ({gameNightId, gameInstancesUpdated, onGameInstanceCha
         </CardBody>
         <CardFooter justifyContent="center">
           <Button onClick={()=>registerForGameInstance({gameInstanceId: gameInstance.game_instance_id, user: user})}>Register to play</Button>
-          <Button onClick={()=>deleteGameInstance({gameInstanceId: gameInstance.game_instance_id})}>Delete</Button>
         </CardFooter>
       </Card>
     ))
@@ -231,13 +247,12 @@ function Header({handleGameNightChange, user, account, auth, fetchAccountInfoFro
   
   return(
     <>
-      <Flex justifyContent="space-between">
+      <Flex justifyContent='space-between'>
         <Text fontSize='sm'>Logged in as {user?.email}</Text>
         <ColorModeSwitcher />
       </Flex>
-      <Flex justifySelf='flex-start'><Button fontSize='sm' onClick={() => {signOut(auth)}}>Log Out</Button></Flex>
-      <Heading>Roll With It</Heading>
-      <Center>
+      <Flex justifyContent='space-between'>
+        <Button fontSize='sm' onClick={() => {signOut(auth)}}>Log Out</Button>
         <Button maxWidth='100px' onClick={() => setShowMyAccountModal(true)}>My Account</Button>
         <MyAccountModal 
           user={user} 
@@ -247,6 +262,9 @@ function Header({handleGameNightChange, user, account, auth, fetchAccountInfoFro
           isOpen={showMyAccountModal} 
           onClose={() => setShowMyAccountModal(false)} 
         />
+      </Flex>
+      <Heading>Roll With It</Heading>
+      <Center>
         <Button 
           maxWidth='200px' 
           onClick={() => setShowCreateGameNightModal(true)}
