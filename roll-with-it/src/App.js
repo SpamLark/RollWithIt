@@ -3,24 +3,19 @@ import moment from 'moment';
 import {
   ChakraProvider,
   Box,
-  Text,
   Grid,
   theme,
   Heading,
-  Button,
   Center,
-  Flex
 } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import { SimpleGrid } from '@chakra-ui/react';
-import { ColorModeSwitcher } from './ColorModeSwitcher';
 import LogInModal from './components/LogInModal';
-import CreateGameNightModal from './components/CreateGameNightModal';
 import GameInstanceForm from './components/GameInstanceForm';
-import MyAccountModal from './components/MyAccountModal';
 import GameInstanceCards from './components/GameInstanceCards';
+import PageHeader from './components/PageHeader';
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import { getAuth, onAuthStateChanged} from 'firebase/auth';
 import { useToast } from '@chakra-ui/react'
 import { Spinner } from '@chakra-ui/react'
 import { Stack } from '@chakra-ui/react'
@@ -156,52 +151,6 @@ const GameNightTabHeadings = ({gameNights}) => {
   );
 }
 
-function Header({handleGameNightChange, user, account, auth, fetchAccountInfoFromDatabase}) {
-
-  const [showCreateGameNightModal, setShowCreateGameNightModal] = useState(false);
-  const [showMyAccountModal, setShowMyAccountModal] = useState(false);
-  
-  return(
-    <>
-      <Flex justifyContent='space-between'>
-        <Text fontSize='sm'>Logged in as {user?.email}</Text>
-        <ColorModeSwitcher />
-      </Flex>
-      <Flex justifyContent='space-between'>
-        <Button fontSize='sm' onClick={() => {signOut(auth)}}>Log Out</Button>
-        <Button maxWidth='100px' mr={3} onClick={() => setShowMyAccountModal(true)}>My Account</Button>
-        <MyAccountModal 
-          user={user} 
-          account={account} 
-          fetchAccountInfoFromDatabase={fetchAccountInfoFromDatabase}
-          auth={auth} 
-          isOpen={showMyAccountModal} 
-          onClose={() => setShowMyAccountModal(false)} 
-        />
-      </Flex>
-      <Heading mt={4} mb={2}>Roll With It</Heading>
-      <Center>
-        {account.isAdmin === 1 && (
-          <Button 
-            maxWidth='200px' 
-            onClick={() => setShowCreateGameNightModal(true)}
-            my={3}
-          >
-              Create Game Night
-          </Button>
-        )}
-        <CreateGameNightModal 
-          isOpen={showCreateGameNightModal}
-          account={account}
-          user={user}
-          onClose={() => setShowCreateGameNightModal(false)} 
-          handleGameNightChange={handleGameNightChange}
-        />
-      </Center>
-    </>
-  );
-}
-
 const App = () => {
 
   const [loading, setLoading] = useState(true);
@@ -280,12 +229,13 @@ const App = () => {
       {!user && <LogInModal isOpen={true} onClose={() => {}} auth={auth} />}
       <Box textAlign='center' fontSize='xl'>
         <Grid p={3}>
-          <Header 
+          <PageHeader 
             handleGameNightChange={handleGameNightChange} 
             user={user} 
             account={account} 
             fetchAccountInfoFromDatabase={fetchAccountInfoFromDatabase} 
             auth={auth} 
+            toast={toast}
           />
           <Tabs>
             <GameNightTabHeadings gameNights={gameNights} />
