@@ -253,7 +253,7 @@ function Header({handleGameNightChange, user, account, auth, fetchAccountInfoFro
       </Flex>
       <Flex justifyContent='space-between'>
         <Button fontSize='sm' onClick={() => {signOut(auth)}}>Log Out</Button>
-        <Button maxWidth='100px' onClick={() => setShowMyAccountModal(true)}>My Account</Button>
+        <Button maxWidth='100px' mr={3} onClick={() => setShowMyAccountModal(true)}>My Account</Button>
         <MyAccountModal 
           user={user} 
           account={account} 
@@ -263,13 +263,13 @@ function Header({handleGameNightChange, user, account, auth, fetchAccountInfoFro
           onClose={() => setShowMyAccountModal(false)} 
         />
       </Flex>
-      <Heading>Roll With It</Heading>
+      <Heading mt={4} mb={2}>Roll With It</Heading>
       <Center>
         {account.isAdmin === 1 && (
           <Button 
             maxWidth='200px' 
             onClick={() => setShowCreateGameNightModal(true)}
-            my={4}
+            my={3}
           >
               Create Game Night
           </Button>
