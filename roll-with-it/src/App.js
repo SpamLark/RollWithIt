@@ -130,8 +130,8 @@ const GameNightTabPanels = ({gameNights, user, toast}) => {
         },
         body: new URLSearchParams(registrationInformation).toString(),
       });
-
-      if (response.ok) {
+      const data = await response.json();
+      if (response.status === 200) {
         console.log('Player registration submitted successfully.')
         //re-render game cards
         handleGameInstanceChange();
@@ -144,13 +144,19 @@ const GameNightTabPanels = ({gameNights, user, toast}) => {
           isClosable: true,
         })
       } else {
-        const data = await response.json();
-        console.log(data);
         console.error('Player registration failed');
         if (data.message.includes('Duplicate entry')) {
           toast({
             title: 'Already Registered.',
             description: 'It looks like you are already registered for this game.',
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+          })
+        } else if (data.message.includes('full')) {
+          toast({
+            title: 'Game Full.',
+            description: 'It looks like this game is at capacity.',
             status: 'error',
             duration: 3000,
             isClosable: true,
