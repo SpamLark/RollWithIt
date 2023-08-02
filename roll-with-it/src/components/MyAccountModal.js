@@ -132,15 +132,15 @@ const MyAccountModal = ({isOpen, onClose, user, account, fetchAccountInfoFromDat
                 <ModalCloseButton />
                 <ModalBody>
                     <form>
-                        <FormControl>
+                        <FormControl my={4}>
                             <FormLabel>Username</FormLabel>
                             <Input name="username" value={newUsername} onChange={handleUsernameChange}/>
                         </FormControl>
-                        <FormControl>
+                        <FormControl my={4}>
                             <FormLabel>Email Address</FormLabel>
                             <Input name="email" value={newEmail} onChange={handleEmailChange}/>
                         </FormControl>
-                        <FormControl>
+                        <FormControl my={4}>
                             <FormLabel>New Password</FormLabel>
                             <Input name="password-new" value={passwordNew} onChange={handlePasswordNewChange}/>
                         </FormControl>

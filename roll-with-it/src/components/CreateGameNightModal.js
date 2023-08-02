@@ -76,11 +76,11 @@ const CreateGameNightModal = ({ isOpen, onClose, handleGameNightChange, user, ac
                 <ModalCloseButton />
                 <ModalBody>
                     <form>
-                        <FormControl>
+                        <FormControl my={4}>
                             <FormLabel>Location</FormLabel>
                             <Input name="location" value={location} onChange={handleLocationChange} />
                         </FormControl>
-                        <FormControl>
+                        <FormControl my={4}>
                             <FormLabel>Date and Time</FormLabel>
                             <Input type="datetime-local" name='date_time' value={dateTime} onChange={handleDateTimeChange} />
                         </FormControl>

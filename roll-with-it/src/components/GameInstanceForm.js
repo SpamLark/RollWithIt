@@ -92,15 +92,15 @@ const GameInstanceForm = ({user, gameNightId, onGameInstanceAdded, registerForGa
         <ModalCloseButton />
         <ModalBody>
           <form key={gameNightId} onSubmit={handleSubmit}>
-            <FormControl>
+            <FormControl my={4}>
               <FormLabel>Game Name</FormLabel>
               <Input name="game_name" value ={formData.game_name} onChange={handleChange} />
             </FormControl>
-            <FormControl>
+            <FormControl my={4}>
               <FormLabel>Minimum Players</FormLabel>
               <Input name="min_players" value={formData.min_players} onChange={handleChange} />
             </FormControl>
-            <FormControl>
+            <FormControl my={4}>
               <FormLabel>Maximum Players</FormLabel>
               <Input name="max_players" value={formData.max_players} onChange={handleChange} />
             </FormControl>
