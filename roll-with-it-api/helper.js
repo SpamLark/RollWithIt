@@ -32,10 +32,35 @@ const isHostMiddleware = async (uid, game_instance_id) => {
     throw new Error('Database error occurred.');
   }
 }
+
+/* Check game instance capacity middleware */
+const hasCapacityMiddleware = async (game_instance_id) => {
+  try {
+    const results = await db.query(
+      `
+      SELECT 
+	      1 AS hasCapacity 
+      FROM 
+	      game_instances gi
+      WHERE
+	      gi.game_instance_id = ?
+        AND gi.max_players > (
+		      SELECT COUNT(*) 
+          FROM player_registrations pr 
+          WHERE pr.game_instance_id = gi.game_instance_id
+        )
+      `, [game_instance_id]
+    );
+    return results[0];
+  } catch (err) {
+    throw new Error('Database error occurred.');
+  }
+}
   
   module.exports = {
     getOffset,
     emptyOrRows,
     isAdminMiddleware,
-    isHostMiddleware
+    isHostMiddleware,
+    hasCapacityMiddleware
   }
