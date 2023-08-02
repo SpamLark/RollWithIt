@@ -265,16 +265,15 @@ function Header({handleGameNightChange, user, account, auth, fetchAccountInfoFro
       </Flex>
       <Heading>Roll With It</Heading>
       <Center>
-        <Button 
-          maxWidth='200px' 
-          onClick={() => setShowCreateGameNightModal(true)}
-          // onClick={() => {
-          //   if (account.isAdmin === 1) {
-          //     setShowCreateGameNightModal(true);
-          //   }
-          // }
-          // }
-          >Create Game Night</Button>
+        {account.isAdmin === 1 && (
+          <Button 
+            maxWidth='200px' 
+            onClick={() => setShowCreateGameNightModal(true)}
+            my={4}
+          >
+              Create Game Night
+          </Button>
+        )}
         <CreateGameNightModal 
           isOpen={showCreateGameNightModal}
           account={account}
