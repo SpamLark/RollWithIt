@@ -30,9 +30,10 @@ function PageHeader({handleGameNightChange, user, account, auth, fetchAccountInf
             user={user} 
             account={account} 
             fetchAccountInfoFromDatabase={fetchAccountInfoFromDatabase}
-            auth={auth} 
+            auth={auth}
+            toast={toast}
             isOpen={showMyAccountModal} 
-            onClose={() => setShowMyAccountModal(false)} 
+            onClose={() => setShowMyAccountModal(false)}
           />
         </Flex>
         <Heading mt={4} mb={2}>Roll With It</Heading>
