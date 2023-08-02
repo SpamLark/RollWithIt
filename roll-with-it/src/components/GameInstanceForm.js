@@ -84,7 +84,7 @@ const GameInstanceForm = ({user, gameNightId, onGameInstanceAdded, registerForGa
   
     return (
     <>
-    <Button onClick={onOpen}>Create Game Instance</Button>
+    <Button onClick={onOpen} my={4}>Create Game Instance</Button>
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
