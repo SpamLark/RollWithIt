@@ -15,7 +15,7 @@ const LogInModal = ({ isOpen, onClose, auth, toast }) => {
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
-  }
+  };
 
   const handleFirebaseError = (errorMessage) => {
     if (errorMessage.includes('already-in-use')) {
@@ -42,6 +42,14 @@ const LogInModal = ({ isOpen, onClose, auth, toast }) => {
         duration: 3000,
         isClosable: true,
       })
+    } else if (errorMessage.includes('user-not-found')) {
+      toast({
+        title: 'User Not Found',
+        description: 'It doesn\'t look like you have an account',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
     } else {
       console.error('Registration error: ', errorMessage);
       toast({
@@ -52,21 +60,24 @@ const LogInModal = ({ isOpen, onClose, auth, toast }) => {
         isClosable: true,
       })
     }
-  }
+  };
 
-  const handleSignIn = (e) => {
+  const handleSignIn = async (e) => {
+    // Prevent default form behaviour
     e.preventDefault();
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log('User logged in:', userCredential.user);
-        console.log('User email is: ', email);
-        console.log('User UID is: ', user.uid);
-        onClose();
-      })
-      .catch((error) => {
-        console.error('Login error:', error);
-      });
+    try {
+      // Attempt sign in with Firebase
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      console.log('User logged in:', user);
+      console.log('User email is: ', email);
+      console.log('User UID is: ', user.uid);
+      // Close the modal
+      onClose();
+    } catch (error) {
+      // Pass Firebase error to helper function
+      handleFirebaseError(error.message);
+    }
   };
 
   const handleSignUp = async (e) => {
@@ -88,7 +99,7 @@ const LogInModal = ({ isOpen, onClose, auth, toast }) => {
       // Pass Firebase error to helper function
       handleFirebaseError(error.message);
     } 
-  }
+  };
 
   const createUserAccount = async (accountDetails) => {
     try {
