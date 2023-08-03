@@ -226,7 +226,7 @@ const App = () => {
 
   return (
     <ChakraProvider theme={theme}>
-      {!user && <LogInModal isOpen={true} onClose={() => {}} auth={auth} />}
+      {!user && <LogInModal isOpen={true} onClose={() => {}} auth={auth} toast={toast}/>}
       <Box textAlign='center' fontSize='xl'>
         <Grid p={3}>
           <PageHeader 
