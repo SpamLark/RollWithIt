@@ -1,18 +1,39 @@
+// Import React elements
 import React, { useState } from 'react';
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter} from '@chakra-ui/react';
-import { FormControl, Button } from '@chakra-ui/react';
-import { FormLabel, Input } from '@chakra-ui/react';
+
+// Import Chakra UI components
+import {
+    Button,
+    FormControl,
+    FormLabel,
+    Input, 
+    Modal, 
+    ModalOverlay, 
+    ModalContent, 
+    ModalHeader, 
+    ModalCloseButton, 
+    ModalBody, 
+    ModalFooter
+} from '@chakra-ui/react';
+
+// Import moment for date handling
 import moment from 'moment';
+
+// Import API config
+import apiConfig from '../apiConfig';
 
 const CreateGameNightModal = ({ isOpen, onClose, handleGameNightChange, user, account, toast}) => {
 
+    // Declare constants to hold location and date time entered on the form
     const [location, setLocation] = useState('');
     const [dateTime, setDateTime] = useState('');
 
+    // Update location constant 
     const handleLocationChange = (e) => {
         setLocation(e.target.value);
     }
 
+    // Update date time constant
     const handleDateTimeChange = (e) => {
         setDateTime(e.target.value);
     }
@@ -76,7 +97,7 @@ const CreateGameNightModal = ({ isOpen, onClose, handleGameNightChange, user, ac
         }
         // Call the API to create a Game Night
         try {
-            const url = 'http://localhost:8000/game-nights';
+            const url = apiConfig.gameNightsRoute;
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {

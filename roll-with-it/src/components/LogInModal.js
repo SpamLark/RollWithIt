@@ -1,8 +1,28 @@
+// Import React elements
 import React, { useState } from 'react';
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Box, Link } from '@chakra-ui/react';
-import { FormControl, Button } from '@chakra-ui/react';
-import { FormLabel, Input } from '@chakra-ui/react';
+
+// Import Chakra UI components
+import { 
+  Modal, 
+  ModalOverlay, 
+  ModalContent, 
+  ModalHeader, 
+  ModalBody, 
+  ModalFooter, 
+  Box, 
+  Link,
+  FormControl,
+  Button,
+  FormLabel,
+  Input
+ } from '@chakra-ui/react';
+
+// Import Firebase elements
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+
+// Import API config
+import apiConfig from '../apiConfig';
+
 
 const LogInModal = ({ isOpen, onClose, auth, toast }) => {
 
@@ -103,7 +123,7 @@ const LogInModal = ({ isOpen, onClose, auth, toast }) => {
 
   const createUserAccount = async (accountDetails) => {
     try {
-      const url = 'http://localhost:8000/users';
+      const url = apiConfig.usersRoute;
       const response = await fetch(url, {
         method: 'POST',
         headers: {

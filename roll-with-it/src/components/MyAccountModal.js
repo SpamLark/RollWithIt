@@ -1,26 +1,36 @@
+// Import React elements
 import React, { useEffect, useState } from 'react';
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from '@chakra-ui/react';
-import { FormControl,FormLabel, Input, Button } from '@chakra-ui/react';
+
+// Import Chakra UI components
+import { 
+    Modal, 
+    ModalOverlay, 
+    ModalContent, 
+    ModalHeader, 
+    ModalCloseButton, 
+    ModalBody, 
+    ModalFooter,
+    FormControl,
+    FormLabel,
+    Input,
+    Button 
+} from '@chakra-ui/react';
+
+//Import Firebase elements
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider, updateEmail } from 'firebase/auth';
+
+// Import API config
+import apiConfig from '../apiConfig';
 
 
 const MyAccountModal = ({isOpen, onClose, user, account, fetchAccountInfoFromDatabase, toast}) => {
 
     // Declare state constants
-    const [username, setUsername] = useState(account?.username);
-    const [newUsername, setNewUsername] = useState(account?.username);
+    const [username, setUsername] = useState(account?.username, '');
+    const [newUsername, setNewUsername] = useState(account?.username, '');
     const [email, setEmail] = useState(user?.email);
     const [newEmail, setEmailNew] = useState(user?.email);
     const [passwordNew, setPasswordNew] = useState('');
-    
-    // If user or account props change, reset all state constants
-    useEffect(() => {
-        setUsername(account?.username);
-        setNewUsername(account?.username);
-        setEmail(user?.email);
-        setEmailNew(user?.email);
-        setPasswordNew('');
-    }, [user, account]);
 
     // Update new username state constant as form field is updated
     const handleUsernameChange = (e) => {
@@ -46,7 +56,7 @@ const MyAccountModal = ({isOpen, onClose, user, account, fetchAccountInfoFromDat
             isAdmin: account.isAdmin,
         }
         try {
-            const url = `http://localhost:8000/users/${newAccountInfo.uid}`;
+            const url = apiConfig.usersRoute + newAccountInfo.uid;
             const response = await fetch(url, {
                 method: 'PUT',
                 headers: {
@@ -197,6 +207,15 @@ const MyAccountModal = ({isOpen, onClose, user, account, fetchAccountInfoFromDat
         setNewUsername(username);
         setPasswordNew('');
     }
+
+    // If user or account props change, reset all state constants
+    useEffect(() => {
+        setUsername(account?.username);
+        setNewUsername(account?.username);
+        setEmail(user?.email);
+        setEmailNew(user?.email);
+        setPasswordNew('');
+    }, [user, account]);
 
     return (
         <Modal isOpen={isOpen} onClose={() => {

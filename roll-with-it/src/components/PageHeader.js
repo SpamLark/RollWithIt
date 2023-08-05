@@ -1,4 +1,7 @@
+// Import React elements
 import React, { useState } from 'react';
+
+// Import Chakra UI components
 import {
   Text,
   Heading,
@@ -6,11 +9,14 @@ import {
   Center,
   Flex
 } from '@chakra-ui/react';
-import { ColorModeSwitcher } from './ColorModeSwitcher';
-import CreateGameNightModal from './CreateGameNightModal';
-import MyAccountModal from './MyAccountModal';
+
+// Import firebase elements
 import { signOut } from 'firebase/auth';
 
+// Import app components
+import CreateGameNightModal from './CreateGameNightModal';
+import MyAccountModal from './MyAccountModal';
+import { ColorModeSwitcher } from './ColorModeSwitcher';
 
 function PageHeader({handleGameNightChange, user, account, auth, fetchAccountInfoFromDatabase, toast}) {
 

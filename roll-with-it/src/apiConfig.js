@@ -5,6 +5,7 @@ const apiConfig = {
     playerRegistrationsRoute: baseURL + 'player-registrations',
     gameNightsRoute: baseURL + 'game-nights',
     usersRoute: baseURL + 'users',
+    gameInstancesRoute: baseURL + 'game-instances',
 };
 
 export default apiConfig;

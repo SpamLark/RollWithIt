@@ -1,5 +1,7 @@
+// Import React elements
 import React, { useEffect, useState } from 'react';
-import moment from 'moment';
+
+// Import Chakra UI components
 import {
   ChakraProvider,
   Box,
@@ -7,18 +9,24 @@ import {
   theme,
   Heading,
   Center,
+  Tabs,
+  useToast,
+  Spinner,
+  Stack
 } from '@chakra-ui/react';
-import { Tabs, TabList, Tab } from '@chakra-ui/react';
+
+// Import Firebase elements
+import { initializeApp } from 'firebase/app';
+import { getAuth, onAuthStateChanged} from 'firebase/auth';
+
+// Import app components
 import LogInModal from './components/LogInModal';
 import GameNightTabPanels from './components/GameNightTabPanels';
 import PageHeader from './components/PageHeader';
-import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged} from 'firebase/auth';
-import { useToast } from '@chakra-ui/react';
-import { Spinner } from '@chakra-ui/react';
-import { Stack } from '@chakra-ui/react';
+import GameNightTabHeadings from './components/GameNightTabHeadings';
+
+// Import API config
 import apiConfig from './apiConfig';
-/*import { Logo } from './Logo';*/
 
 //Firebase configuration settings
 const firebaseConfig = {
@@ -37,18 +45,6 @@ const app = initializeApp(firebaseConfig);
 //Initialise Firebase Authentication and get a reference to the service
 const auth = getAuth(app);
 
-const GameNightTabHeadings = ({gameNights}) => {
-  return (
-      <TabList alignItems='center' justifyContent='center'>
-        {gameNights.data && gameNights.data.map(gameNight => (
-        <Tab key={gameNight.game_night_id}>{gameNight.game_night_location} <br></br> {
-          moment(gameNight.game_night_datetime, 'YYYY-MM-DDTHH:mm:ss.SSSZ').format('dddd Do MMMM, h:mm a')
-          }</Tab>
-        ))}
-      </TabList>
-  );
-}
-
 const App = () => {
 
   const [loading, setLoading] = useState(true);
@@ -58,11 +54,13 @@ const App = () => {
   const toast = useToast();
   const [gameNightsUpdated, setGameNightsUpdated] = useState(false);
 
+  // When user is authenticated, set the user and turn off the loading screen
   onAuthStateChanged(auth, (user) => {
     setUser(user);
-    setLoading(false)
+    setLoading(false);
   });
 
+  // When user is updated by Firebase, retrieve users information from Roll With It database
   useEffect(() => {
     if (user) {
       fetchAccountInfoFromDatabase();
@@ -70,36 +68,23 @@ const App = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
+  // When game nights are updated, retrieve game nights from Roll With It database
   useEffect(() => {
-    const fetchGameNights = () => {
-      fetch(apiConfig.gameNightsRoute)
-        .then(response => {
-          return response.json()
-        })
-        .then(data => {
-          setGameNights(data)
-        })
-    }
+    fetchGameNights();
+  }, [gameNightsUpdated]);
 
-    fetchGameNights()
-  }, [gameNightsUpdated])
-
-
-  const fetchAccountInfoFromDatabase = async () => {
+  // Fetch game nights via API
+  const fetchGameNights = async () => {
     try {
-      const fetchURL = apiConfig.usersRoute + '/' + user.uid;
-      const response = await fetch(fetchURL);
+      const response = await fetch(apiConfig.gameNightsRoute)
       const data = await response.json();
-      console.log(data);
-      setAccount({
-        username: data.accountInfo[0].username,
-        isAdmin: data.accountInfo[0].is_admin,
-      })
+      setGameNights(data);
     } catch (error) {
-      console.log('Error identifying account details');
+      console.log('Error fetching game night: ', error);
     }
   }
 
+  // Called to trigger fresh fetch of Game Nights from the Roll With It database
   const handleGameNightChange = () => {
     // Set gameNightsUpdated to True to trigger the re-rendering of the Tab Headings
     setGameNightsUpdated(true);
@@ -109,8 +94,23 @@ const App = () => {
     }, 1000);
   }
 
+  // Fetch account info via API
+  const fetchAccountInfoFromDatabase = async () => {
+    try {
+      const fetchURL = apiConfig.usersRoute + '/' + user.uid;
+      const response = await fetch(fetchURL);
+      const data = await response.json();
+      setAccount({
+        username: data.accountInfo[0].username,
+        isAdmin: data.accountInfo[0].is_admin,
+      })
+    } catch (error) {
+      console.log('Error identifying account details');
+    }
+  }
+
+  // While loading, render loading spinner and message
   if (loading) {
-    // While loading, don't render anything (you can also display a loading spinner)
     return (
       <ChakraProvider theme={theme}>
         <Center h="100vh">
@@ -127,7 +127,14 @@ const App = () => {
 
   return (
     <ChakraProvider theme={theme}>
-      {!user && <LogInModal isOpen={true} onClose={() => {}} auth={auth} toast={toast}/>}
+      { // If user has not been set (i.e. user is not logged in), display the log in modal
+        !user && 
+          <LogInModal 
+            isOpen={true} 
+            onClose={() => {}} 
+            auth={auth} 
+            toast={toast}
+          />}
       <Box textAlign='center' fontSize='xl'>
         <Grid p={3}>
           <PageHeader 
@@ -139,8 +146,14 @@ const App = () => {
             toast={toast}
           />
           <Tabs>
-            <GameNightTabHeadings gameNights={gameNights} />
-            <GameNightTabPanels gameNights={gameNights} user={user} toast={toast}/>
+            <GameNightTabHeadings 
+              gameNights={gameNights} 
+            />
+            <GameNightTabPanels 
+              gameNights={gameNights} 
+              user={user} 
+              toast={toast}
+            />
           </Tabs>
         </Grid>
       </Box>

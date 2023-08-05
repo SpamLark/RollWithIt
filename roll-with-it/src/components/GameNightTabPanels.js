@@ -4,7 +4,6 @@ import { SimpleGrid } from '@chakra-ui/react';
 import GameInstanceForm from './GameInstanceForm';
 import GameInstanceCards from './GameInstanceCards';
 import apiConfig from '../apiConfig';
-/*import { Logo } from './Logo';*/
 
 const GameNightTabPanels = ({gameNights, user, toast}) => {
     const [gameInstancesUpdated, setGameInstancesUpdated] = useState(false);
