@@ -56,7 +56,7 @@ const MyAccountModal = ({isOpen, onClose, user, account, fetchAccountInfoFromDat
             isAdmin: account.isAdmin,
         }
         try {
-            const url = apiConfig.usersRoute + newAccountInfo.uid;
+            const url = apiConfig.usersRoute + '/' + newAccountInfo.uid;
             const response = await fetch(url, {
                 method: 'PUT',
                 headers: {

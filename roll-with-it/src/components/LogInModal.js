@@ -10,7 +10,6 @@ import {
   ModalBody, 
   ModalFooter, 
   Box, 
-  Link,
   FormControl,
   Button,
   FormLabel,
@@ -20,8 +19,12 @@ import {
 // Import Firebase elements
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
+// Import app components
+import TermsOfService from './TermsOfServiceModal';
+
 // Import API config
 import apiConfig from '../apiConfig';
+
 
 
 const LogInModal = ({ isOpen, onClose, auth, toast }) => {
@@ -162,11 +165,12 @@ const LogInModal = ({ isOpen, onClose, auth, toast }) => {
                 </FormControl>
             </form>
             <Box display="flex" justifyContent="center">
-              <Button onClick={handleSignIn}>Log-in</Button>
+              <Button onClick={handleSignIn} my={4} mx={2}>Log-in</Button>
+              <Button onClick={handleSignUp} my={4} mx={2}>Register</Button>
             </Box>
           </ModalBody>
           <ModalFooter justifyContent="center">
-            <Link onClick={handleSignUp}>Register</Link>
+            <TermsOfService />
           </ModalFooter>
         </ModalContent>
       </Modal>

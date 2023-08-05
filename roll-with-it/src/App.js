@@ -24,6 +24,7 @@ import LogInModal from './components/LogInModal';
 import GameNightTabPanels from './components/GameNightTabPanels';
 import PageHeader from './components/PageHeader';
 import GameNightTabHeadings from './components/GameNightTabHeadings';
+import TermsOfService from './components/TermsOfServiceModal';
 
 // Import API config
 import apiConfig from './apiConfig';
@@ -156,6 +157,7 @@ const App = () => {
             />
           </Tabs>
         </Grid>
+        <TermsOfService />
       </Box>
     </ChakraProvider>
   );
