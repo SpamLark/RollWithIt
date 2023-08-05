@@ -53,6 +53,7 @@ function PageHeader({handleGameNightChange, user, account, auth, fetchAccountInf
             user={user}
             onClose={() => setShowCreateGameNightModal(false)} 
             handleGameNightChange={handleGameNightChange}
+            toast={toast}
           />
         </Center>
       </>
