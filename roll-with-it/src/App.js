@@ -122,6 +122,7 @@ const GameNightTabPanels = ({gameNights, user, toast}) => {
         gameNightId={gameNight.game_night_id} 
         onGameInstanceAdded={handleGameInstanceChange} 
         registerForGameInstance={registerForGameInstance}
+        toast={toast}
       />
       <SimpleGrid spacing={4} templateColumns='repeat(auto-fill, minmax(300px, 1fr))'  alignItems='center'>
         <GameInstanceCards 
