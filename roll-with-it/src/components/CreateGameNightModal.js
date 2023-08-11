@@ -16,8 +16,8 @@ import {
     ModalFooter
 } from '@chakra-ui/react';
 
-// Import moment for date handling
-import moment from 'moment';
+// Import dayjs for date handling
+import dayjs from 'dayjs';
 
 // Import API config
 import apiConfig from '../apiConfig';
@@ -81,8 +81,8 @@ const CreateGameNightModal = ({ isOpen, onClose, handleGameNightChange, user, ac
     const handleCreateGameNight = async (e) => {
         // Prevent default form behaviour
         e.preventDefault();
-        // User moment to parse entered date time string
-        const parsedMoment = moment(dateTime, 'YYYY-MM-DDTHH:mm');
+        // Use dayjs to parse entered date time string
+        const parsedMoment = dayjs(dateTime, 'YYYY-MM-DDTHH:mm');
         // Convert parse date time to format required for the Roll With It database
         const formattedDateTime = parsedMoment.format('YYYY-MM-DD HH:mm:ss');
         // Validate form data and escape function if invalid
