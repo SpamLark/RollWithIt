@@ -67,7 +67,6 @@ const GameNightTabPanels = ({gameNights, user, toast}) => {
         }
       } catch (error) {
         console.error('Error submitting player registration: ', error);
-        //Add error handling
       }
     }
   

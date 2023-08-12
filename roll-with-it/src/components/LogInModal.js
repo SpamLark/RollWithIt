@@ -73,6 +73,14 @@ const LogInModal = ({ isOpen, onClose, auth, toast }) => {
         duration: 3000,
         isClosable: true,
       })
+    } else if (errorMessage.includes('wrong-password')) {
+      toast({
+        title: 'Incorrect Password',
+        description: 'If you have forgotten your password, please contact the administrator.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
     } else {
       console.error('Registration error: ', errorMessage);
       toast({

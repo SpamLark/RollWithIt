@@ -124,9 +124,16 @@ const GameInstanceForm = ({user, gameNightId, onGameInstanceAdded, registerForGa
       // If response is okay:
       if (response.ok) {
         const data = await response.json();
-        console.log('Game Instance Data submitted successfully.');
         // Close modal form
         onClose(true);
+        // Confirm game instance creation to user
+        toast({
+          title: 'Game Instance Created',
+          description: 'Your game was created successfully.',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
         // Create player registration for user creating game instance
         registerForGameInstance({gameInstanceId: data.game_instance_id, user: user});
         // Re-render the current game night tab

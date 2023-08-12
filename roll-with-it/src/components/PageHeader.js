@@ -29,9 +29,9 @@ function PageHeader({handleGameNightChange, user, account, auth, fetchAccountInf
           <Text fontSize='sm'>Logged in as {user?.email}</Text>
           <ColorModeSwitcher />
         </Flex>
-        <Flex justifyContent='space-between'>
+        <Flex>
+          <Button maxWidth='100px' mr={4} onClick={() => setShowMyAccountModal(true)}>My Account</Button>
           <Button fontSize='sm' onClick={() => {signOut(auth)}}>Log Out</Button>
-          <Button maxWidth='100px' mr={3} onClick={() => setShowMyAccountModal(true)}>My Account</Button>
           <MyAccountModal 
             user={user} 
             account={account} 
